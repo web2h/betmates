@@ -10,4 +10,25 @@
 		<artifactId>betmates-rest-app</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>${org.flywaydb.version}</version>
+				
+				<configuration>
+                    <configFile>src/main/resources/flyway.properties</configFile>
+                </configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

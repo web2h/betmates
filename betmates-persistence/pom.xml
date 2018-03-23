@@ -10,4 +10,12 @@
 		<artifactId>betmates-rest-app</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
+	
+	<dependencies>
+		<dependency>
+			<groupId>com.web2h.betmates</groupId>
+			<artifactId>betmates-model</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 </project>
