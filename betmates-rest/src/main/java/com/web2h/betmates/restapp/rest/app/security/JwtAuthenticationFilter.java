@@ -18,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -55,5 +56,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		jwtBuilder.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME));
 		jwtBuilder.signWith(SignatureAlgorithm.HS512, SECRET.getBytes());
 		response.addHeader(HEADER_STRING, TOKEN_PREFIX + jwtBuilder.compact());
+		
+		String roles = "";
+		for (GrantedAuthority authority : ((User) authResult.getPrincipal()).getAuthorities()) {
+			if (!roles.isEmpty()) {
+				roles += ",";
+			}
+			roles += authority.getAuthority();
+		}
+		jwtBuilder.claim("ROLES", roles);		
 	}
 }

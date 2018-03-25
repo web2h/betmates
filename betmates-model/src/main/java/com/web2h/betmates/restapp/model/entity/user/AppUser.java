@@ -5,13 +5,18 @@ import static com.web2h.betmates.restapp.model.entity.FieldLength.NAME_MAX_LENGT
 import static com.web2h.betmates.restapp.model.entity.FieldLength.PASSWORD_MAX_LENGTH;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.STATUS_MAX_LENGTH;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -36,12 +41,12 @@ public class AppUser {
 	protected Long id;
 
 	/** EMAIL - User email address. */
-	@Column(name = "email", length = EMAIL_MAX_LENGTH)
+	@Column(name = "email", length = EMAIL_MAX_LENGTH, unique = true)
 	private String email;
 
-	/** PSEUDO - User pseudo. */
-	@Column(name = "pseudo", length = NAME_MAX_LENGTH)
-	private String pseudo;
+	/** ALIAS - User's alias. */
+	@Column(name = "alias", length = NAME_MAX_LENGTH, unique = true)
+	private String alias;
 
 	/** PASSWORD - User password. */
 	@Column(name = "password", length = PASSWORD_MAX_LENGTH)
@@ -51,6 +56,10 @@ public class AppUser {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", length = STATUS_MAX_LENGTH)
 	private AppUserStatus status = AppUserStatus.NOT_CONFIRMED;
+	
+	/** ROLES - User role. */
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+	private Set<AppUserRole> roles = new HashSet<>();
 
 	@Override
 	public int hashCode() {
@@ -79,7 +88,7 @@ public class AppUser {
 		buffer.append(StringTools.getFieldAndValueToString(Field.ID, id));
 		buffer.append(StringTools.getFieldAndValueToString(Field.EMAIL, email));
 		buffer.append(StringTools.getFieldAndValueToString(Field.PASSWORD, PasswordFactory.maskPassword(password)));
-		buffer.append(StringTools.getFieldAndValueToString(Field.PSEUDO, pseudo));
+		buffer.append(StringTools.getFieldAndValueToString(Field.ALIAS, alias));
 		return buffer.toString();
 	}
 
@@ -99,12 +108,12 @@ public class AppUser {
 		this.email = email;
 	}
 
-	public String getPseudo() {
-		return pseudo;
+	public String getAlias() {
+		return alias;
 	}
 
-	public void setPseudo(String pseudo) {
-		this.pseudo = pseudo;
+	public void setAlias(String alias) {
+		this.alias = alias;
 	}
 
 	public String getPassword() {
@@ -121,5 +130,9 @@ public class AppUser {
 
 	public void setStatus(AppUserStatus status) {
 		this.status = status;
+	}
+
+	public Set<AppUserRole> getRoles() {
+		return roles;
 	}
 }

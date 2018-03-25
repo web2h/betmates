@@ -4,9 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +21,7 @@ import com.web2h.betmates.restapp.model.exception.InternalErrorException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user")
 public class UserController {
 
 	private Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -29,6 +31,14 @@ public class UserController {
 	public UserController(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
 		this.userService = userService;
 		this.userService.setbCryptPasswordEncoder(bCryptPasswordEncoder);
+	}
+	
+	@GetMapping("admin")
+	@Secured("RGR")
+	public ResponseEntity<Object> seeAdmin() {
+		AppUser user = new AppUser();
+		user.setAlias("Billy the Kid");
+		return new ResponseEntity<Object>(user, HttpStatus.OK);
 	}
 
 	@PostMapping("/sign-up")
