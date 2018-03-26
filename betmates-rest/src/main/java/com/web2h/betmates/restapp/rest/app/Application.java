@@ -22,4 +22,7 @@ public class Application {
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
+
+	// TODO Remove json elements when null
+	// TODO Trim json input
 }

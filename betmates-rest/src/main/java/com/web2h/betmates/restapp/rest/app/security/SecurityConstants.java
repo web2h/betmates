@@ -7,4 +7,5 @@ public interface SecurityConstants {
 	String TOKEN_PREFIX = "Bearer ";
 	String HEADER_STRING = "Authorization";
 	String SIGN_UP_URL = "/user/sign-up";
+	String CLAIMS_KEY_AUTHORITIES = "authorities";
 }

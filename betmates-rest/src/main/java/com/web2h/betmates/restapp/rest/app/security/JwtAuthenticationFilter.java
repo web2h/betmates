@@ -1,5 +1,6 @@
 package com.web2h.betmates.restapp.rest.app.security;
 
+import static com.web2h.betmates.restapp.rest.app.security.SecurityConstants.CLAIMS_KEY_AUTHORITIES;
 import static com.web2h.betmates.restapp.rest.app.security.SecurityConstants.EXPIRATION_TIME;
 import static com.web2h.betmates.restapp.rest.app.security.SecurityConstants.HEADER_STRING;
 import static com.web2h.betmates.restapp.rest.app.security.SecurityConstants.SECRET;
@@ -55,15 +56,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		jwtBuilder.setSubject(((User) authResult.getPrincipal()).getUsername());
 		jwtBuilder.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME));
 		jwtBuilder.signWith(SignatureAlgorithm.HS512, SECRET.getBytes());
-		response.addHeader(HEADER_STRING, TOKEN_PREFIX + jwtBuilder.compact());
-		
-		String roles = "";
+		String authorityList = "";
 		for (GrantedAuthority authority : ((User) authResult.getPrincipal()).getAuthorities()) {
-			if (!roles.isEmpty()) {
-				roles += ",";
+			if (!authorityList.isEmpty()) {
+				authorityList += ",";
 			}
-			roles += authority.getAuthority();
+			authorityList += authority.getAuthority();
 		}
-		jwtBuilder.claim("ROLES", roles);		
+		jwtBuilder.claim(CLAIMS_KEY_AUTHORITIES, authorityList);
+		response.addHeader(HEADER_STRING, TOKEN_PREFIX + jwtBuilder.compact());
 	}
 }

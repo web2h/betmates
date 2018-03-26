@@ -3,20 +3,16 @@ package com.web2h.betmates.restapp.model.entity.user;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.EMAIL_MAX_LENGTH;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.NAME_MAX_LENGTH;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.PASSWORD_MAX_LENGTH;
+import static com.web2h.betmates.restapp.model.entity.FieldLength.ROLE_MAX_LENGTH;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.STATUS_MAX_LENGTH;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -56,10 +52,11 @@ public class AppUser {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", length = STATUS_MAX_LENGTH)
 	private AppUserStatus status = AppUserStatus.NOT_CONFIRMED;
-	
+
 	/** ROLES - User role. */
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-	private Set<AppUserRole> roles = new HashSet<>();
+	@Enumerated(EnumType.STRING)
+	@Column(name = "role", length = ROLE_MAX_LENGTH)
+	private AppUserRole role = AppUserRole.ROLE_PLAYER;
 
 	@Override
 	public int hashCode() {
@@ -132,7 +129,11 @@ public class AppUser {
 		this.status = status;
 	}
 
-	public Set<AppUserRole> getRoles() {
-		return roles;
+	public AppUserRole getRole() {
+		return role;
+	}
+
+	public void setRole(AppUserRole role) {
+		this.role = role;
 	}
 }

@@ -1,12 +1,6 @@
 package com.web2h.betmates.restapp.core.service.user;
 
-import static java.util.Collections.emptyList;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
-import com.web2h.betmates.restapp.model.entity.user.AppUserRole;
 import com.web2h.betmates.restapp.model.entity.user.AppUserStatus;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.validation.Field;
@@ -49,11 +42,7 @@ public class UserServiceImpl implements UserService {
 		if (appUser == null || !AppUserStatus.ACTIVE.equals(appUser.getStatus())) {
 			throw new UsernameNotFoundException(username);
 		}
-		Set<GrantedAuthority> roles = new HashSet<>();
-		for (AppUserRole role : appUser.getRoles()) {
-			roles.add(new SimpleGrantedAuthority(role.getRole().toString()));
-		}
-		return new User(appUser.getEmail(), appUser.getPassword(), roles);
+		return new User(appUser.getEmail(), appUser.getPassword(), AuthorityUtils.commaSeparatedStringToAuthorityList(appUser.getRole().getAuthorities()));
 	}
 
 	@Override
@@ -63,11 +52,11 @@ public class UserServiceImpl implements UserService {
 		AppUser existingUser = appUserRepository.findByEmail(appUser.getEmail());
 		if (existingUser != null) {
 			throw new AlreadyExistsException(Field.EMAIL);
-		} 
+		}
 		existingUser = appUserRepository.findByAlias(appUser.getAlias());
 		if (existingUser != null) {
 			throw new AlreadyExistsException(Field.ALIAS);
-		}		
+		}
 
 		// Encrypting password
 		appUser.setPassword(bCryptPasswordEncoder.encode(appUser.getPassword()));

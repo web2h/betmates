@@ -1,5 +1,6 @@
 package com.web2h.betmates.restapp.rest.app.security;
 
+import static com.web2h.betmates.restapp.rest.app.security.SecurityConstants.CLAIMS_KEY_AUTHORITIES;
 import static com.web2h.betmates.restapp.rest.app.security.SecurityConstants.HEADER_STRING;
 import static com.web2h.betmates.restapp.rest.app.security.SecurityConstants.SECRET;
 import static com.web2h.betmates.restapp.rest.app.security.SecurityConstants.TOKEN_PREFIX;
@@ -45,10 +46,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 			// Parsing the token
 			Claims claims = Jwts.parser().setSigningKey(SECRET.getBytes()).parseClaimsJws(token.replace(TOKEN_PREFIX, "")).getBody();
 			String user = claims.getSubject();
-			String roles = (String) claims.get("ROLES");
 
 			if (user != null) {
-				return new UsernamePasswordAuthenticationToken(user, null, AuthorityUtils.commaSeparatedStringToAuthorityList(roles));
+				return new UsernamePasswordAuthenticationToken(user, null, AuthorityUtils.commaSeparatedStringToAuthorityList((String) claims.get(CLAIMS_KEY_AUTHORITIES)));
 			}
 			return null;
 		}

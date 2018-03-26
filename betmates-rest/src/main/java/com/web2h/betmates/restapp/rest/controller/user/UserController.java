@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -32,18 +32,19 @@ public class UserController {
 		this.userService = userService;
 		this.userService.setbCryptPasswordEncoder(bCryptPasswordEncoder);
 	}
-	
-	@GetMapping("admin")
-	@Secured("RGR")
+
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	@GetMapping("/admin")
 	public ResponseEntity<Object> seeAdmin() {
+		// TODO Example to remove
 		AppUser user = new AppUser();
 		user.setAlias("Billy the Kid");
 		return new ResponseEntity<Object>(user, HttpStatus.OK);
 	}
 
 	@PostMapping("/sign-up")
-	public ResponseEntity<Object> signUp(@RequestBody @Validated AppUser user,
-			BindingResult result) {
+	// TODO Validate sign up data
+	public ResponseEntity<Object> signUp(@RequestBody @Validated AppUser user, BindingResult result) {
 		logger.info("User sign up - " + user);
 
 		if (result.hasErrors()) {
