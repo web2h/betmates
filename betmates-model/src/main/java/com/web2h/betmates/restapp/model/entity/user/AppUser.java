@@ -3,8 +3,10 @@ package com.web2h.betmates.restapp.model.entity.user;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.EMAIL_MAX_LENGTH;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.NAME_MAX_LENGTH;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.PASSWORD_MAX_LENGTH;
+import static com.web2h.betmates.restapp.model.entity.FieldLength.PASSWORD_MIN_LENGTH;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.ROLE_MAX_LENGTH;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.STATUS_MAX_LENGTH;
+import static com.web2h.betmates.restapp.model.entity.FieldLength.TEXT_MIN_LENGTH;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,13 +16,20 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.Size;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.web2h.betmates.restapp.model.validation.Field;
+import com.web2h.betmates.restapp.model.validation.group.Creatable;
+import com.web2h.betmates.restapp.model.validation.group.Editable;
 import com.web2h.tools.StringTools;
 import com.web2h.tools.authentication.PasswordFactory;
+import com.web2h.utils.form.validator.annotation.Email;
 
 /**
  * Application user entity class.
@@ -34,28 +43,39 @@ public class AppUser {
 	/** ID - Internal person ID. */
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@NotNull(groups = Editable.class)
+	@Null(groups = Creatable.class)
 	protected Long id;
 
 	/** EMAIL - User email address. */
 	@Column(name = "email", length = EMAIL_MAX_LENGTH, unique = true)
+	@NotNull
+	@Email
+	@Size(max = EMAIL_MAX_LENGTH)
 	private String email;
 
 	/** ALIAS - User's alias. */
 	@Column(name = "alias", length = NAME_MAX_LENGTH, unique = true)
+	@NotNull
+	@Size(min = TEXT_MIN_LENGTH, max = NAME_MAX_LENGTH)
 	private String alias;
 
 	/** PASSWORD - User password. */
 	@Column(name = "password", length = PASSWORD_MAX_LENGTH)
+	@NotNull
+	@Size(min = PASSWORD_MIN_LENGTH, max = PASSWORD_MAX_LENGTH)
 	private String password;
 
 	/** STATUS - Status of the user. */
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", length = STATUS_MAX_LENGTH)
+	@JsonIgnore
 	private AppUserStatus status = AppUserStatus.NOT_CONFIRMED;
 
 	/** ROLES - User role. */
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role", length = ROLE_MAX_LENGTH)
+	@NotNull
 	private AppUserRole role = AppUserRole.ROLE_PLAYER;
 
 	@Override
@@ -113,6 +133,7 @@ public class AppUser {
 		this.alias = alias;
 	}
 
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}

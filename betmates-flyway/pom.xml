@@ -7,7 +7,7 @@
 	
 	<parent>
 		<groupId>com.web2h.betmates</groupId>
-		<artifactId>betmates-rest-app</artifactId>
+		<artifactId>betmates-restapp</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	

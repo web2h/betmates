@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -19,6 +18,7 @@ import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InternalErrorException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
+import com.web2h.betmates.restapp.model.validation.group.Creatable;
 
 @RestController
 @RequestMapping("/user")
@@ -28,12 +28,14 @@ public class UserController {
 
 	private UserService userService;
 
+	public static final String URL_SIGN_UP = "/user/sign-up";
+
 	public UserController(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
 		this.userService = userService;
 		this.userService.setbCryptPasswordEncoder(bCryptPasswordEncoder);
 	}
 
-	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	// @PreAuthorize("hasRole('ADMINISTRATOR')")
 	@GetMapping("/admin")
 	public ResponseEntity<Object> seeAdmin() {
 		// TODO Example to remove
@@ -44,7 +46,7 @@ public class UserController {
 
 	@PostMapping("/sign-up")
 	// TODO Validate sign up data
-	public ResponseEntity<Object> signUp(@RequestBody @Validated AppUser user, BindingResult result) {
+	public ResponseEntity<Object> signUp(@RequestBody @Validated(Creatable.class) AppUser user, BindingResult result) {
 		logger.info("User sign up - " + user);
 
 		if (result.hasErrors()) {
