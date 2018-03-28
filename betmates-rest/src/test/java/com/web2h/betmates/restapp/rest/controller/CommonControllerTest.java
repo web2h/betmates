@@ -1,4 +1,4 @@
-package com.web2h.betmates.restapp.resp.controller;
+package com.web2h.betmates.restapp.rest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

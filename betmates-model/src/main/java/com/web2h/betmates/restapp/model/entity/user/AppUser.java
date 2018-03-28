@@ -24,6 +24,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.web2h.betmates.restapp.model.deserializer.JsonTrimmerDeserializer;
 import com.web2h.betmates.restapp.model.validation.Field;
 import com.web2h.betmates.restapp.model.validation.group.Creatable;
 import com.web2h.betmates.restapp.model.validation.group.Editable;
@@ -52,12 +54,14 @@ public class AppUser {
 	@NotNull
 	@Email
 	@Size(max = EMAIL_MAX_LENGTH)
+	@JsonDeserialize(using = JsonTrimmerDeserializer.class)
 	private String email;
 
 	/** ALIAS - User's alias. */
 	@Column(name = "alias", length = NAME_MAX_LENGTH, unique = true)
 	@NotNull
 	@Size(min = TEXT_MIN_LENGTH, max = NAME_MAX_LENGTH)
+	@JsonDeserialize(using = JsonTrimmerDeserializer.class)
 	private String alias;
 
 	/** PASSWORD - User password. */
@@ -133,7 +137,6 @@ public class AppUser {
 		this.alias = alias;
 	}
 
-	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}

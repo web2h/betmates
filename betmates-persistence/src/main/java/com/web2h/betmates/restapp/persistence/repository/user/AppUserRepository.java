@@ -14,6 +14,6 @@ import com.web2h.betmates.restapp.model.entity.user.AppUser;
 public interface AppUserRepository extends CrudRepository<AppUser, Serializable> {
 
 	AppUser findByEmail(String email);
-	
+
 	AppUser findByAlias(String alias);
 }

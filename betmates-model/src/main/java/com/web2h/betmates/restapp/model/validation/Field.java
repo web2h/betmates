@@ -10,9 +10,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum Field {
 
 	ALIAS("alias"),
-	ID("id"), 
+	ID("id"),
 	EMAIL("email"),
-	PASSWORD("password");
+	PASSWORD("password"),
+	ROLE("role");
 
 	private Field(String lowerCaseValue) {
 		this.lowerCaseValue = lowerCaseValue;

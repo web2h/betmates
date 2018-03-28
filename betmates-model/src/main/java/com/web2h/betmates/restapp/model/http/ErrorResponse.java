@@ -1,4 +1,5 @@
 package com.web2h.betmates.restapp.model.http;
+
 import java.util.ArrayList;
 import java.util.List;
 

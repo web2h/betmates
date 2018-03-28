@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.web2h.betmates</groupId>
 	<artifactId>betmates-restapp</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Betmates REST application - Parent</name>
 	
@@ -15,11 +15,11 @@
 	<modules>
 		<module>betmates-model</module>
 		<module>betmates-persistence</module>
+		<module>betmates-flyway</module>
 		<module>betmates-core</module>
 		<module>betmates-rest</module>
-		<module>betmates-flyway</module>
 	</modules>
-		
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

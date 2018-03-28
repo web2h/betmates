@@ -13,13 +13,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum ErrorCode {
 
-	ALREADY_EXISTS("AlreadyExists"),
-	EMPTY("Empty", "NotNull"),
-	NOT_EMPTY("NotEmpty", "Null"),
-	NOT_FOUND("NotFound"),
-	INVALID_EMAIL("InvalidEmail", "Email"),
-	TOO_LONG("TooLong"),
-	TOO_SHORT("TooShort");
+	ALREADY_EXISTS("AlreadyExists"), EMPTY("Empty", "NotNull"), NOT_EMPTY("NotEmpty", "Null"), NOT_FOUND(
+			"NotFound"), INVALID_EMAIL("InvalidEmail", "Email"), TOO_LONG("TooLong"), TOO_SHORT("TooShort");
 
 	private Set<String> codes;
 

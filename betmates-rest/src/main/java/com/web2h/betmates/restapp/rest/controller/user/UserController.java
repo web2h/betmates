@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,33 +18,21 @@ import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InternalErrorException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
 import com.web2h.betmates.restapp.model.validation.group.Creatable;
+import com.web2h.betmates.restapp.rest.controller.CommonController;
+import com.web2h.betmates.restapp.rest.controller.UrlConstants;
 
 @RestController
-@RequestMapping("/user")
-public class UserController {
+@RequestMapping(UrlConstants.USER_PREFIX)
+public class UserController extends CommonController {
 
 	private Logger logger = LoggerFactory.getLogger(UserController.class);
 
-	private UserService userService;
-
-	public static final String URL_SIGN_UP = "/user/sign-up";
-
 	public UserController(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
-		this.userService = userService;
+		super(userService);
 		this.userService.setbCryptPasswordEncoder(bCryptPasswordEncoder);
 	}
 
-	// @PreAuthorize("hasRole('ADMINISTRATOR')")
-	@GetMapping("/admin")
-	public ResponseEntity<Object> seeAdmin() {
-		// TODO Example to remove
-		AppUser user = new AppUser();
-		user.setAlias("Billy the Kid");
-		return new ResponseEntity<Object>(user, HttpStatus.OK);
-	}
-
 	@PostMapping("/sign-up")
-	// TODO Validate sign up data
 	public ResponseEntity<Object> signUp(@RequestBody @Validated(Creatable.class) AppUser user, BindingResult result) {
 		logger.info("User sign up - " + user);
 

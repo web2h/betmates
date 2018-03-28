@@ -1,11 +1,4 @@
-# Eclipse files
-.project
+target
+.settings
 .classpath
-.settings/
-target/
-
-# Compiled class file
-*.class
-
-# Log file
-*.log
+.project

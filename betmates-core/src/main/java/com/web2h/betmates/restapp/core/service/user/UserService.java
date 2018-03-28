@@ -18,8 +18,7 @@ public interface UserService extends UserDetailsService {
 	 * 
 	 * @param userEmail
 	 *            The user email address
-	 * @return The retrieved {@link AppUser} instance, <code>null</code> if none
-	 *         could be found
+	 * @return The retrieved {@link AppUser} instance, <code>null</code> if none could be found
 	 */
 	AppUser getAppUserByEmail(String userEmail);
 

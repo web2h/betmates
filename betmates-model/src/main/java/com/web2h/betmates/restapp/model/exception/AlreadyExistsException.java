@@ -17,14 +17,14 @@ import com.web2h.betmates.restapp.model.validation.Field;
  * @author web2h
  */
 public class AlreadyExistsException extends Exception {
-	
-	private static final Map<Field, String> messages;
+
+	public static final Map<Field, String> messages;
 	static {
 		Map<Field, String> aMap = new HashMap<>();
-        aMap.put(Field.ALIAS, "A user already exists with the given alias");
-        aMap.put(Field.EMAIL, "A user already exists with the given email");
-        messages = Collections.unmodifiableMap(aMap);
-    }
+		aMap.put(Field.ALIAS, "A user already exists with the given alias");
+		aMap.put(Field.EMAIL, "A user already exists with the given email");
+		messages = Collections.unmodifiableMap(aMap);
+	}
 
 	private static final long serialVersionUID = 1L;
 

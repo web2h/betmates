@@ -1,6 +1,4 @@
-package com.web2h.betmates.restapp.resp.controller;
-
-import static com.web2h.betmates.restapp.rest.app.security.SecurityConstants.SIGN_UP_URL;
+package com.web2h.betmates.restapp.rest.controller;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -28,7 +26,7 @@ public class WebSecurityTest extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.cors().and().csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll().anyRequest().authenticated().and()
+		http.cors().and().csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, UrlConstants.SIGN_UP_URL).permitAll().anyRequest().authenticated().and()
 				// this disables session creation on Spring Security
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}

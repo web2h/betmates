@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootApplication
-@EnableJpaRepositories("com.web2h.betmates")
-@EntityScan("com.web2h.betmates.restapp.model")
-@ComponentScan("com.web2h.betmates")
+@EnableJpaRepositories("com.web2h.potacrayons")
+@EntityScan("com.web2h.potacrayons.model")
+@ComponentScan("com.web2h.potacrayons")
 public class Application {
 
 	@Bean
@@ -22,7 +22,4 @@ public class Application {
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
-
-	// TODO Remove json elements when null
-	// TODO Trim json input
 }
