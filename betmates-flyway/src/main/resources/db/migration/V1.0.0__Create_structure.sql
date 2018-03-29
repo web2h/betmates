@@ -12,7 +12,7 @@ CREATE TABLE `app_users` (
 	UNIQUE INDEX `idx_unique_app_users_alias` (alias)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `core_data` (
+CREATE TABLE `basic_references` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`name_en` VARCHAR(64) NOT NULL,
 	`name_fr` VARCHAR(64) NOT NULL,
@@ -20,8 +20,30 @@ CREATE TABLE `core_data` (
 	`country_id` INT DEFAULT NULL,
 	`city_id` INT DEFAULT NULL,
 	PRIMARY KEY (`id`),
-	CONSTRAINT `fk_core_data_country_id` FOREIGN KEY (`country_id`) REFERENCES `core_data` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-	CONSTRAINT `fk_core_data_references_city_id` FOREIGN KEY (`city_id`) REFERENCES `core_data` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+	CONSTRAINT `fk_basic_references_country_id` FOREIGN KEY (`country_id`) REFERENCES `basic_references` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+	CONSTRAINT `fk_basic_references_city_id` FOREIGN KEY (`city_id`) REFERENCES `basic_references` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `reference_log_events` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`event_ts` TIMESTAMP NOT NULL,
+	`reference_id` INT NOT NULL,
+	`app_user_id` INT NOT NULL,
+	`event_type` VARCHAR(32) NOT NULL,
+	`description` VARCHAR(512) DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `fk_reference_log_events_basic_references_reference_id` FOREIGN KEY (`reference_id`) REFERENCES `basic_references` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+	CONSTRAINT `fk_reference_log_events_app_users_app_user_id` FOREIGN KEY (`app_user_id`) REFERENCES `app_users` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `reference_log_event_changes` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`field` VARCHAR(16) NOT NULL,
+	`old_value` VARCHAR(1024) DEFAULT NULL,
+	`new_value` VARCHAR(1024) DEFAULT NULL,
+	`log_event_id` INT NOT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `fk_reference_log_event_changes_log_events_log_event_id` FOREIGN KEY (`log_event_id`) REFERENCES `reference_log_events` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `competitions` (

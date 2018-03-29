@@ -21,6 +21,7 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.web2h.betmates.restapp.model.deserializer.JsonTrimmerDeserializer;
 import com.web2h.betmates.restapp.model.validation.Field;
@@ -67,6 +68,11 @@ public abstract class Reference {
 
 	public boolean isBeingEdited() {
 		return id != null;
+	}
+
+	@JsonIgnore
+	public String getLogValue() {
+		return nameEn + " / " + nameFr;
 	}
 
 	@Override
