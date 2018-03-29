@@ -17,7 +17,8 @@ public enum Field {
 	NAME_EN("nameEn"),
 	NAME_FR("nameFr"),
 	PASSWORD("password"),
-	ROLE("role");
+	ROLE("role"),
+	TYPE("type");
 
 	private Field(String lowerCaseValue) {
 		this.lowerCaseValue = lowerCaseValue;

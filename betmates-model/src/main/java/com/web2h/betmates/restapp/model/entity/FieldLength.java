@@ -7,9 +7,7 @@ package com.web2h.betmates.restapp.model.entity;
  */
 public interface FieldLength {
 
-	int COUNTRY_CODE_MAX_LENGTH = 3;
-
-	int COUNTRY_CODE_MIN_LENGTH = 3;
+	int COMPETITION_TYPE_MAX_LENGTH = 32;
 
 	int EMAIL_MAX_LENGTH = 128;
 

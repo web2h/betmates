@@ -14,7 +14,7 @@ CREATE TABLE `app_users` (
 
 CREATE TABLE `core_data` (
 	`id` INT NOT NULL AUTO_INCREMENT,
-	`name_en` VARCHAR(128) NOT NULL,
+	`name_en` VARCHAR(64) NOT NULL,
 	`name_fr` VARCHAR(64) NOT NULL,
 	`discriminator` VARCHAR(16) NOT NULL,
 	`country_id` INT DEFAULT NULL,
@@ -22,4 +22,13 @@ CREATE TABLE `core_data` (
 	PRIMARY KEY (`id`),
 	CONSTRAINT `fk_core_data_country_id` FOREIGN KEY (`country_id`) REFERENCES `core_data` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
 	CONSTRAINT `fk_core_data_references_city_id` FOREIGN KEY (`city_id`) REFERENCES `core_data` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `competitions` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`name_en` VARCHAR(64) NOT NULL,
+	`name_fr` VARCHAR(64) NOT NULL,
+	`competition_type` VARCHAR(32) NOT NULL,
+	`start_date` DATE NOT NULL,
+	PRIMARY KEY (`id`),
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
