@@ -7,9 +7,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories("com.web2h.potacrayons")
-@EntityScan("com.web2h.potacrayons.model")
-@ComponentScan("com.web2h.potacrayons")
+@EnableJpaRepositories("com.web2h.betmates")
+@EntityScan("com.web2h.betmates.restapp.model")
+@ComponentScan("com.web2h.betmates")
 public class ApplicationTest {
 
 	public static void main(String[] args) {

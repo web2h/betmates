@@ -1,7 +1,6 @@
 package com.web2h.betmates.restapp.core.service.user;
 
-import static java.util.Collections.emptyList;
-
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -44,7 +43,7 @@ public class UserServiceImpl implements UserService {
 		if (appUser == null || !AppUserStatus.ACTIVE.equals(appUser.getStatus())) {
 			throw new UsernameNotFoundException(username);
 		}
-		return new User(appUser.getEmail(), appUser.getPassword(), emptyList());
+		return new User(appUser.getEmail(), appUser.getPassword(), AuthorityUtils.commaSeparatedStringToAuthorityList(appUser.getRole().getAuthorities()));
 	}
 
 	@Override

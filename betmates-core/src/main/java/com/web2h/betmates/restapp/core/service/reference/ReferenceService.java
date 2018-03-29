@@ -15,5 +15,18 @@ import com.web2h.betmates.restapp.model.exception.InvalidDataException;
  */
 public interface ReferenceService<R extends Reference> {
 
+	/**
+	 * Creates a new reference.
+	 * 
+	 * @param reference
+	 *            The reference to create
+	 * @param creator
+	 *            The user who requested the creation
+	 * @return The created reference
+	 * @throws AlreadyExistsException
+	 *             When the reference already exists
+	 * @throws InvalidDataException
+	 *             When wrong data was provided
+	 */
 	R create(R reference, AppUser creator) throws AlreadyExistsException, InvalidDataException;
 }

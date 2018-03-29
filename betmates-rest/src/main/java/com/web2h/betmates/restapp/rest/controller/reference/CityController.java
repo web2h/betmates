@@ -6,6 +6,7 @@ import static com.web2h.betmates.restapp.rest.controller.UrlConstants.CITY_PREFI
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,7 @@ import com.web2h.betmates.restapp.model.validation.group.CreationChecks;
  */
 @RestController
 @RequestMapping(ADMIN_PREFIX + CITY_PREFIX)
+@PreAuthorize("hasRole('ADMINISTRATOR')")
 public class CityController extends ReferenceController<City> {
 
 	private Logger logger = LoggerFactory.getLogger(CityController.class);

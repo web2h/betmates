@@ -1,5 +1,6 @@
 package com.web2h.betmates.restapp.rest.app.security;
 
+import static com.web2h.betmates.restapp.rest.app.security.SecurityConstants.CLAIM_KEY_AUTHORITIES;
 import static com.web2h.betmates.restapp.rest.app.security.SecurityConstants.EXPIRATION_TIME;
 import static com.web2h.betmates.restapp.rest.app.security.SecurityConstants.HEADER_STRING;
 import static com.web2h.betmates.restapp.rest.app.security.SecurityConstants.SECRET;
@@ -18,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -54,6 +56,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		jwtBuilder.setSubject(((User) authResult.getPrincipal()).getUsername());
 		jwtBuilder.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME));
 		jwtBuilder.signWith(SignatureAlgorithm.HS512, SECRET.getBytes());
+		String roleList = "";
+		for (GrantedAuthority authority : ((User) authResult.getPrincipal()).getAuthorities()) {
+			if (!roleList.isEmpty()) {
+				roleList += ",";
+			}
+			roleList += authority.getAuthority();
+		}
+		jwtBuilder.claim(CLAIM_KEY_AUTHORITIES, roleList);
 		response.addHeader(HEADER_STRING, TOKEN_PREFIX + jwtBuilder.compact());
 	}
 }

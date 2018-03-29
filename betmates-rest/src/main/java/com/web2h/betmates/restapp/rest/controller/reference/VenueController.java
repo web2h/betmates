@@ -6,6 +6,7 @@ import static com.web2h.betmates.restapp.rest.controller.UrlConstants.VENUE_PREF
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,7 @@ import com.web2h.betmates.restapp.model.validation.group.CreationChecks;
  */
 @RestController
 @RequestMapping(ADMIN_PREFIX + VENUE_PREFIX)
+@PreAuthorize("hasRole('ADMINISTRATOR')")
 public class VenueController extends ReferenceController<Venue> {
 
 	private Logger logger = LoggerFactory.getLogger(VenueController.class);
