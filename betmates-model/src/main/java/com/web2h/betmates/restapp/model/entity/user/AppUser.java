@@ -27,8 +27,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.web2h.betmates.restapp.model.deserializer.JsonTrimmerDeserializer;
 import com.web2h.betmates.restapp.model.validation.Field;
-import com.web2h.betmates.restapp.model.validation.group.Creatable;
-import com.web2h.betmates.restapp.model.validation.group.Editable;
+import com.web2h.betmates.restapp.model.validation.group.CreationChecks;
+import com.web2h.betmates.restapp.model.validation.group.EditionChecks;
 import com.web2h.tools.StringTools;
 import com.web2h.tools.authentication.PasswordFactory;
 import com.web2h.utils.form.validator.annotation.Email;
@@ -45,12 +45,12 @@ public class AppUser {
 	/** ID - Internal person ID. */
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@NotNull(groups = Editable.class)
-	@Null(groups = Creatable.class)
+	@NotNull(groups = EditionChecks.class)
+	@Null(groups = CreationChecks.class)
 	protected Long id;
 
 	/** EMAIL - User email address. */
-	@Column(name = "email", length = EMAIL_MAX_LENGTH, unique = true)
+	@Column(name = "email", length = EMAIL_MAX_LENGTH, unique = true, nullable = false)
 	@NotNull
 	@Email
 	@Size(max = EMAIL_MAX_LENGTH)
@@ -58,27 +58,27 @@ public class AppUser {
 	private String email;
 
 	/** ALIAS - User's alias. */
-	@Column(name = "alias", length = NAME_MAX_LENGTH, unique = true)
+	@Column(name = "alias", length = NAME_MAX_LENGTH, unique = true, nullable = false)
 	@NotNull
 	@Size(min = TEXT_MIN_LENGTH, max = NAME_MAX_LENGTH)
 	@JsonDeserialize(using = JsonTrimmerDeserializer.class)
 	private String alias;
 
 	/** PASSWORD - User password. */
-	@Column(name = "password", length = PASSWORD_MAX_LENGTH)
+	@Column(name = "password", length = PASSWORD_MAX_LENGTH, nullable = false)
 	@NotNull
 	@Size(min = PASSWORD_MIN_LENGTH, max = PASSWORD_MAX_LENGTH)
 	private String password;
 
 	/** STATUS - Status of the user. */
 	@Enumerated(EnumType.STRING)
-	@Column(name = "status", length = STATUS_MAX_LENGTH)
+	@Column(name = "status", length = STATUS_MAX_LENGTH, nullable = false)
 	@JsonIgnore
 	private AppUserStatus status = AppUserStatus.NOT_CONFIRMED;
 
 	/** ROLES - User role. */
 	@Enumerated(EnumType.STRING)
-	@Column(name = "role", length = ROLE_MAX_LENGTH)
+	@Column(name = "role", length = ROLE_MAX_LENGTH, nullable = false)
 	@NotNull
 	private AppUserRole role = AppUserRole.ROLE_PLAYER;
 

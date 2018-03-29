@@ -9,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Preconditions;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.entity.user.AppUserStatus;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
@@ -48,6 +49,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public AppUser signUpAppUser(AppUser appUser) throws AlreadyExistsException {
+		Preconditions.checkNotNull(appUser);
 
 		// Checking if the user does not already exists
 		AppUser existingUser = appUserRepository.findByEmail(appUser.getEmail());

@@ -10,8 +10,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum Field {
 
 	ALIAS("alias"),
+	CITY("city"),
+	COUNTRY("country"),
+	COUNTRY_ID("country.id"),
 	ID("id"),
 	EMAIL("email"),
+	NAME_EN("nameEn"),
+	NAME_FR("nameFr"),
 	PASSWORD("password"),
 	ROLE("role");
 

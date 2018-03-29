@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,12 +60,8 @@ public class UserControllerTest extends CommonControllerTest {
 		given(userService.signUpAppUser(anyObject())).willReturn(appUser);
 
 		ResultActions actions = mockMvc.perform(post(SIGN_UP_URL).contentType(MediaType.APPLICATION_JSON).content(jsonUser));
-
 		actions.andExpect(status().isOk());
-		actions.andExpect(jsonPath("$.id", equalTo(1)));
-		actions.andExpect(jsonPath("$.email", equalTo(appUser.getEmail())));
-		actions.andExpect(jsonPath("$.alias", equalTo(appUser.getAlias())));
-		actions.andExpect(jsonPath("$.role", equalTo(AppUserRole.ROLE_PLAYER.name())));
+		Assert.assertEquals(asJsonString(appUser), actions.andReturn().getResponse().getContentAsString());
 	}
 
 	@Test
@@ -85,9 +82,7 @@ public class UserControllerTest extends CommonControllerTest {
 		ResultActions actions = mockMvc.perform(post(SIGN_UP_URL).contentType(MediaType.APPLICATION_JSON).content(jsonUser));
 
 		actions.andExpect(status().isOk());
-		actions.andExpect(jsonPath("$.id", equalTo(1)));
-		actions.andExpect(jsonPath("$.email", equalTo(appUser.getEmail())));
-		actions.andExpect(jsonPath("$.alias", equalTo(appUser.getAlias())));
+		Assert.assertEquals(asJsonString(appUser), actions.andReturn().getResponse().getContentAsString());
 	}
 
 	@Test
@@ -98,7 +93,7 @@ public class UserControllerTest extends CommonControllerTest {
 		ResultActions actions = mockMvc.perform(post(SIGN_UP_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(appUser)));
 		actions.andExpect(status().isBadRequest());
 		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.message", equalTo(AlreadyExistsException.messages.get(Field.EMAIL))));
+		actions.andExpect(jsonPath("$.message", equalTo(AlreadyExistsException.messages.get(Field.EMAIL.name()))));
 		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.EMAIL.toString())));
 		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.ALREADY_EXISTS.getJsonValue())));
 	}
@@ -111,7 +106,7 @@ public class UserControllerTest extends CommonControllerTest {
 		ResultActions actions = mockMvc.perform(post(SIGN_UP_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(appUser)));
 		actions.andExpect(status().isBadRequest());
 		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.message", equalTo(AlreadyExistsException.messages.get(Field.ALIAS))));
+		actions.andExpect(jsonPath("$.message", equalTo(AlreadyExistsException.messages.get(Field.ALIAS.name()))));
 		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.ALIAS.toString())));
 		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.ALREADY_EXISTS.getJsonValue())));
 	}

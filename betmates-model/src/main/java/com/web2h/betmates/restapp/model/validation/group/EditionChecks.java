@@ -7,6 +7,6 @@ import javax.validation.groups.Default;
  * 
  * @author web2h
  */
-public interface Editable extends Default {
+public interface EditionChecks extends Default {
 
 }

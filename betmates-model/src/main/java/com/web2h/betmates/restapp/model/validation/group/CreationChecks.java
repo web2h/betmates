@@ -7,6 +7,6 @@ import javax.validation.groups.Default;
  * 
  * @author web2h
  */
-public interface Creatable extends Default {
+public interface CreationChecks extends Default {
 
 }

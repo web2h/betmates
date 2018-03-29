@@ -11,3 +11,15 @@ CREATE TABLE `app_users` (
 	UNIQUE INDEX `idx_unique_app_users_email` (email),
 	UNIQUE INDEX `idx_unique_app_users_alias` (alias)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `core_data` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`name_en` VARCHAR(128) NOT NULL,
+	`name_fr` VARCHAR(64) NOT NULL,
+	`discriminator` VARCHAR(16) NOT NULL,
+	`country_id` INT DEFAULT NULL,
+	`city_id` INT DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	CONSTRAINT `fk_core_data_country_id` FOREIGN KEY (`country_id`) REFERENCES `core_data` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+	CONSTRAINT `fk_core_data_references_city_id` FOREIGN KEY (`city_id`) REFERENCES `core_data` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

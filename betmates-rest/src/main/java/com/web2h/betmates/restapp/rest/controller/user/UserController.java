@@ -17,7 +17,7 @@ import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InternalErrorException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
-import com.web2h.betmates.restapp.model.validation.group.Creatable;
+import com.web2h.betmates.restapp.model.validation.group.CreationChecks;
 import com.web2h.betmates.restapp.rest.controller.CommonController;
 import com.web2h.betmates.restapp.rest.controller.UrlConstants;
 
@@ -33,7 +33,7 @@ public class UserController extends CommonController {
 	}
 
 	@PostMapping("/sign-up")
-	public ResponseEntity<Object> signUp(@RequestBody @Validated(Creatable.class) AppUser user, BindingResult result) {
+	public ResponseEntity<Object> signUp(@RequestBody @Validated(CreationChecks.class) AppUser user, BindingResult result) {
 		logger.info("User sign up - " + user);
 
 		if (result.hasErrors()) {
@@ -42,9 +42,9 @@ public class UserController extends CommonController {
 			return ide.getResponseEntity();
 		}
 
-		AppUser createdUSer = null;
+		AppUser createdUser = null;
 		try {
-			createdUSer = userService.signUpAppUser(user);
+			createdUser = userService.signUpAppUser(user);
 		} catch (AlreadyExistsException aee) {
 			logger.warn(aee.getMessage());
 			return aee.getResponseEntity();
@@ -52,6 +52,6 @@ public class UserController extends CommonController {
 			return new InternalErrorException(e.getMessage()).getResponseEntity();
 		}
 
-		return new ResponseEntity<Object>(createdUSer, HttpStatus.OK);
+		return new ResponseEntity<Object>(createdUser, HttpStatus.OK);
 	}
 }
