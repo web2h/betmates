@@ -3,12 +3,14 @@ package com.web2h.betmates.restapp.rest.controller.reference;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.NAME_MAX_LENGTH;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.TEXT_MIN_LENGTH;
 import static com.web2h.betmates.restapp.rest.controller.UrlConstants.VENUE_CREATION_URL;
+import static com.web2h.betmates.restapp.rest.controller.UrlConstants.VENUE_EDITION_URL;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,6 +38,8 @@ import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
 import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
+import com.web2h.betmates.restapp.model.exception.InvalidDataException;
+import com.web2h.betmates.restapp.model.exception.NotFoundException;
 import com.web2h.betmates.restapp.model.validation.ErrorCode;
 import com.web2h.betmates.restapp.model.validation.Field;
 import com.web2h.betmates.restapp.rest.controller.ApplicationTest;
@@ -73,7 +77,7 @@ public class VenueControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithValidCity_ShouldReturnOk() throws Exception {
-		Venue venue = createValidVenue();
+		Venue venue = createValidVenueForCreation();
 		String jsonVenue = asJsonString(venue);
 		venue.setId(1l);
 		given(venueService.create(anyObject(), anyObject())).willReturn(venue);
@@ -85,7 +89,7 @@ public class VenueControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithValidCityNotTrimmed_ShouldReturnOk() throws Exception {
-		Venue venue = createValidVenue();
+		Venue venue = createValidVenueForCreation();
 		String nameEn = StringTools.random(FieldLength.NAME_MAX_LENGTH);
 		String nameFr = StringTools.random(FieldLength.NAME_MAX_LENGTH);
 		venue.setNameEn(StringTools.padWithBlanks(nameEn));
@@ -103,7 +107,7 @@ public class VenueControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithExistingEnglishName_ShouldReturnBadRequest() throws Exception {
-		Venue venue = createValidVenue();
+		Venue venue = createValidVenueForCreation();
 		given(venueService.create(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_EN, Venue.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
@@ -116,7 +120,7 @@ public class VenueControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithExistingFrenchName_ShouldReturnBadRequest() throws Exception {
-		Venue venue = createValidVenue();
+		Venue venue = createValidVenueForCreation();
 		given(venueService.create(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_FR, Venue.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
@@ -128,8 +132,21 @@ public class VenueControllerTest extends CommonControllerTest {
 	}
 
 	@Test
+	public void create_WithUnknownCity_ShouldReturnBadRequest() throws Exception {
+		Venue venue = createValidVenueForCreation();
+		given(venueService.create(anyObject(), anyObject())).willThrow(new InvalidDataException(Field.CITY, ErrorCode.NOT_FOUND));
+
+		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.message", equalTo(InvalidDataException.DEFAULT_MESSAGE)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.CITY.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.NOT_FOUND.getJsonValue())));
+	}
+
+	@Test
 	public void create_WithServerException_ShouldReturnInternalServerError() throws Exception {
-		Venue venue = createValidVenue();
+		Venue venue = createValidVenueForCreation();
 		given(venueService.create(anyObject(), anyObject())).willThrow(new RuntimeException("Message"));
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
@@ -139,7 +156,7 @@ public class VenueControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithProvidedId_ShouldReturnBadRequest() throws Exception {
-		Venue venue = createValidVenue();
+		Venue venue = createValidVenueForCreation();
 		venue.setId(1l);
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
@@ -151,7 +168,7 @@ public class VenueControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithMissingEnglishName_ShouldReturnBadRequest() throws Exception {
-		Venue venue = createValidVenue();
+		Venue venue = createValidVenueForCreation();
 		venue.setNameEn(null);
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
@@ -163,7 +180,7 @@ public class VenueControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithTooLongEnglishName_ShouldReturnBadRequest() throws Exception {
-		Venue venue = createValidVenue();
+		Venue venue = createValidVenueForCreation();
 		venue.setNameEn(StringTools.random(NAME_MAX_LENGTH + 1));
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
@@ -175,7 +192,7 @@ public class VenueControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithTooShortEnglishName_ShouldReturnBadRequest() throws Exception {
-		Venue venue = createValidVenue();
+		Venue venue = createValidVenueForCreation();
 		venue.setNameEn(StringTools.random(TEXT_MIN_LENGTH - 1));
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
@@ -187,7 +204,7 @@ public class VenueControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithMissingFrenchName_ShouldReturnBadRequest() throws Exception {
-		Venue venue = createValidVenue();
+		Venue venue = createValidVenueForCreation();
 		venue.setNameFr(null);
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
@@ -199,7 +216,7 @@ public class VenueControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithTooLongFrenchName_ShouldReturnBadRequest() throws Exception {
-		Venue venue = createValidVenue();
+		Venue venue = createValidVenueForCreation();
 		venue.setNameFr(StringTools.random(NAME_MAX_LENGTH + 1));
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
@@ -211,7 +228,7 @@ public class VenueControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithTooShortFrenchName_ShouldReturnBadRequest() throws Exception {
-		Venue venue = createValidVenue();
+		Venue venue = createValidVenueForCreation();
 		venue.setNameFr(StringTools.random(TEXT_MIN_LENGTH - 1));
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
@@ -223,7 +240,7 @@ public class VenueControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithMissingCity_ShouldReturnBadRequest() throws Exception {
-		Venue venue = createValidVenue();
+		Venue venue = createValidVenueForCreation();
 		venue.setCity(null);
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
@@ -233,7 +250,165 @@ public class VenueControllerTest extends CommonControllerTest {
 		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.EMPTY.getJsonValue())));
 	}
 
-	private Venue createValidVenue() {
+	@Test
+	public void edit_WithValidVenue_ShouldReturnOk() throws Exception {
+		Venue venue = createValidVenueForEdition();
+		String jsonVenue = asJsonString(venue);
+		given(venueService.edit(anyObject(), anyObject())).willReturn(venue);
+
+		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonVenue));
+		actions.andExpect(status().isOk());
+		Assert.assertEquals(asJsonString(venue), actions.andReturn().getResponse().getContentAsString());
+	}
+
+	@Test
+	public void edit_UnknownVenue_ShouldReturnNotFound() throws Exception {
+		Venue venue = createValidVenueForEdition();
+		String jsonVenue = asJsonString(venue);
+		given(venueService.edit(anyObject(), anyObject())).willThrow(new NotFoundException(Field.ID, Venue.class.getName()));
+
+		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonVenue));
+		actions.andExpect(status().isNotFound());
+		actions.andExpect(jsonPath("$.message", equalTo(NotFoundException.messages.get(Field.ID.name() + Venue.class.getName()))));
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.ID.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.NOT_FOUND.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithUnknownCity_ShouldReturnBadRequest() throws Exception {
+		Venue venue = createValidVenueForEdition();
+		given(venueService.edit(anyObject(), anyObject())).willThrow(new InvalidDataException(Field.CITY, ErrorCode.NOT_FOUND));
+
+		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.message", equalTo(InvalidDataException.DEFAULT_MESSAGE)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.CITY.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.NOT_FOUND.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithExistingEnglishName_ShouldReturnBadRequest() throws Exception {
+		Venue venue = createValidVenueForEdition();
+		given(venueService.edit(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_EN, Venue.class.getName()));
+
+		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.message", equalTo(AlreadyExistsException.messages.get(Field.NAME_EN.name() + Venue.class.getName()))));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_EN.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.ALREADY_EXISTS.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithExistingFrenchName_ShouldReturnBadRequest() throws Exception {
+		Venue venue = createValidVenueForEdition();
+		given(venueService.edit(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_FR, Venue.class.getName()));
+
+		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.message", equalTo(AlreadyExistsException.messages.get(Field.NAME_FR.name() + Venue.class.getName()))));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_FR.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.ALREADY_EXISTS.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithServerException_ShouldReturnInternalServerError() throws Exception {
+		Venue venue = createValidVenueForEdition();
+		given(venueService.edit(anyObject(), anyObject())).willThrow(new RuntimeException("Message"));
+
+		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
+		actions.andExpect(status().isInternalServerError());
+		actions.andExpect(jsonPath("$.message", equalTo("Message")));
+	}
+
+	@Test
+	public void edit_WithMissingId_ShouldReturnBadRequest() throws Exception {
+		Venue venue = createValidVenueForEdition();
+		venue.setId(null);
+
+		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.ID.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.EMPTY.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithMissingEnglishName_ShouldReturnBadRequest() throws Exception {
+		Venue venue = createValidVenueForEdition();
+		venue.setNameEn(null);
+
+		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_EN.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.EMPTY.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithTooLongEnglishName_ShouldReturnBadRequest() throws Exception {
+		Venue venue = createValidVenueForEdition();
+		venue.setNameEn(StringTools.random(NAME_MAX_LENGTH + 1));
+
+		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_EN.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_LONG.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithTooShortEnglishName_ShouldReturnBadRequest() throws Exception {
+		Venue venue = createValidVenueForEdition();
+		venue.setNameEn(StringTools.random(TEXT_MIN_LENGTH - 1));
+
+		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_EN.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_SHORT.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithMissingFrenchName_ShouldReturnBadRequest() throws Exception {
+		Venue venue = createValidVenueForEdition();
+		venue.setNameFr(null);
+
+		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_FR.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.EMPTY.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithTooLongFrenchName_ShouldReturnBadRequest() throws Exception {
+		Venue venue = createValidVenueForEdition();
+		venue.setNameFr(StringTools.random(NAME_MAX_LENGTH + 1));
+
+		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_FR.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_LONG.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithTooShortFrenchName_ShouldReturnBadRequest() throws Exception {
+		Venue venue = createValidVenueForEdition();
+		venue.setNameFr(StringTools.random(TEXT_MIN_LENGTH - 1));
+
+		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_FR.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_SHORT.getJsonValue())));
+	}
+
+	private Venue createValidVenueForCreation() {
 		Venue venue = new Venue();
 		venue.setNameEn(StringTools.random(NAME_MAX_LENGTH));
 		venue.setNameFr(StringTools.random(NAME_MAX_LENGTH));
@@ -247,6 +422,12 @@ public class VenueControllerTest extends CommonControllerTest {
 		country.setNameFr(StringTools.random(NAME_MAX_LENGTH));
 		city.setCountry(country);
 		venue.setCity(city);
+		return venue;
+	}
+
+	private Venue createValidVenueForEdition() {
+		Venue venue = createValidVenueForCreation();
+		venue.setId(1l);
 		return venue;
 	}
 }

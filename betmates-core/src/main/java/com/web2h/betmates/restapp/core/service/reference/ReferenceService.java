@@ -4,6 +4,7 @@ import com.web2h.betmates.restapp.model.entity.reference.Reference;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
+import com.web2h.betmates.restapp.model.exception.NotFoundException;
 
 /**
  * Reference service interface.
@@ -29,4 +30,21 @@ public interface ReferenceService<R extends Reference> {
 	 *             When wrong data was provided
 	 */
 	R create(R reference, AppUser creator) throws AlreadyExistsException, InvalidDataException;
+
+	/**
+	 * Edits an existing reference.
+	 * 
+	 * @param reference
+	 *            The reference to edit
+	 * @param editor
+	 *            The user who requested the edition
+	 * @return The edited reference
+	 * @throws NotFoundException
+	 *             When the reference to edit does not exist
+	 * @throws AlreadyExistsException
+	 *             When the new values are already used by another reference
+	 * @throws InvalidDataException
+	 *             When wrong data was provided
+	 */
+	R edit(R reference, AppUser editor) throws NotFoundException, AlreadyExistsException, InvalidDataException;
 }

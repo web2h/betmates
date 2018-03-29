@@ -60,4 +60,13 @@ public class VenueServiceImpl extends ReferenceServiceImpl<Venue> implements Ven
 	public ReferenceRepository<Venue> getRepository() {
 		return venueRepository;
 	}
+
+	@Override
+	public void merge(Venue existingVenue, Venue newVenue) {
+		super.merge(existingVenue, newVenue);
+		if (!existingVenue.getCity().equals(newVenue.getCity())) {
+			City newCity = cityRepository.findOne(newVenue.getCity().getId());
+			existingVenue.setCity(newCity);
+		}
+	}
 }

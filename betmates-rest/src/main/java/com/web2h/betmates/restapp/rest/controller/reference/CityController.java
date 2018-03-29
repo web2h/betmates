@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +19,7 @@ import com.web2h.betmates.restapp.core.service.reference.ReferenceService;
 import com.web2h.betmates.restapp.core.service.user.UserService;
 import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.validation.group.CreationChecks;
+import com.web2h.betmates.restapp.model.validation.group.EditionChecks;
 
 /**
  * City administration controller.
@@ -39,6 +41,12 @@ public class CityController extends ReferenceController<City> {
 	public ResponseEntity<Object> create(@RequestBody @Validated(CreationChecks.class) City city, BindingResult result) {
 		logger.info("City creation" + city);
 		return super.create(city, result);
+	}
+
+	@PutMapping
+	public ResponseEntity<Object> edit(@RequestBody @Validated(EditionChecks.class) City city, BindingResult result) {
+		logger.info("City edition" + city);
+		return super.edit(city, result);
 	}
 
 	@Override

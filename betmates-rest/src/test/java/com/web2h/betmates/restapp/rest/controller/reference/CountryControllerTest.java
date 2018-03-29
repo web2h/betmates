@@ -3,12 +3,14 @@ package com.web2h.betmates.restapp.rest.controller.reference;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.NAME_MAX_LENGTH;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.TEXT_MIN_LENGTH;
 import static com.web2h.betmates.restapp.rest.controller.UrlConstants.COUNTRY_CREATION_URL;
+import static com.web2h.betmates.restapp.rest.controller.UrlConstants.COUNTRY_EDITION_URL;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,6 +36,7 @@ import com.web2h.betmates.restapp.core.service.user.UserService;
 import com.web2h.betmates.restapp.model.entity.FieldLength;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
+import com.web2h.betmates.restapp.model.exception.NotFoundException;
 import com.web2h.betmates.restapp.model.validation.ErrorCode;
 import com.web2h.betmates.restapp.model.validation.Field;
 import com.web2h.betmates.restapp.rest.controller.ApplicationTest;
@@ -71,7 +74,7 @@ public class CountryControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithValidCountry_ShouldReturnOk() throws Exception {
-		Country country = createValidCountry();
+		Country country = createValidCountryForCreation();
 		String jsonCountry = asJsonString(country);
 		country.setId(1l);
 		given(countryService.create(anyObject(), anyObject())).willReturn(country);
@@ -83,7 +86,7 @@ public class CountryControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithValidCountryNotTrimmed_ShouldReturnOk() throws Exception {
-		Country country = createValidCountry();
+		Country country = createValidCountryForCreation();
 		String nameEn = StringTools.random(FieldLength.NAME_MAX_LENGTH);
 		String nameFr = StringTools.random(FieldLength.NAME_MAX_LENGTH);
 		country.setNameEn(StringTools.padWithBlanks(nameEn));
@@ -102,7 +105,7 @@ public class CountryControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithExistingEnglishName_ShouldReturnBadRequest() throws Exception {
-		Country country = createValidCountry();
+		Country country = createValidCountryForCreation();
 		given(countryService.create(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_EN, Country.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(COUNTRY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
@@ -115,7 +118,7 @@ public class CountryControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithExistingFrenchName_ShouldReturnBadRequest() throws Exception {
-		Country country = createValidCountry();
+		Country country = createValidCountryForCreation();
 		given(countryService.create(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_FR, Country.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(COUNTRY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
@@ -128,7 +131,7 @@ public class CountryControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithServerException_ShouldReturnInternalServerError() throws Exception {
-		Country country = createValidCountry();
+		Country country = createValidCountryForCreation();
 		given(countryService.create(anyObject(), anyObject())).willThrow(new RuntimeException("Message"));
 
 		ResultActions actions = mockMvc.perform(post(COUNTRY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
@@ -138,7 +141,7 @@ public class CountryControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithProvidedId_ShouldReturnBadRequest() throws Exception {
-		Country country = createValidCountry();
+		Country country = createValidCountryForCreation();
 		country.setId(1l);
 
 		ResultActions actions = mockMvc.perform(post(COUNTRY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
@@ -150,7 +153,7 @@ public class CountryControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithMissingEnglishName_ShouldReturnBadRequest() throws Exception {
-		Country country = createValidCountry();
+		Country country = createValidCountryForCreation();
 		country.setNameEn(null);
 
 		ResultActions actions = mockMvc.perform(post(COUNTRY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
@@ -162,7 +165,7 @@ public class CountryControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithTooLongEnglishName_ShouldReturnBadRequest() throws Exception {
-		Country country = createValidCountry();
+		Country country = createValidCountryForCreation();
 		country.setNameEn(StringTools.random(NAME_MAX_LENGTH + 1));
 
 		ResultActions actions = mockMvc.perform(post(COUNTRY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
@@ -174,7 +177,7 @@ public class CountryControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithTooShortEnglishName_ShouldReturnBadRequest() throws Exception {
-		Country country = createValidCountry();
+		Country country = createValidCountryForCreation();
 		country.setNameEn(StringTools.random(TEXT_MIN_LENGTH - 1));
 
 		ResultActions actions = mockMvc.perform(post(COUNTRY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
@@ -186,7 +189,7 @@ public class CountryControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithMissingFrenchName_ShouldReturnBadRequest() throws Exception {
-		Country country = createValidCountry();
+		Country country = createValidCountryForCreation();
 		country.setNameFr(null);
 
 		ResultActions actions = mockMvc.perform(post(COUNTRY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
@@ -198,7 +201,7 @@ public class CountryControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithTooLongFrenchName_ShouldReturnBadRequest() throws Exception {
-		Country country = createValidCountry();
+		Country country = createValidCountryForCreation();
 		country.setNameFr(StringTools.random(NAME_MAX_LENGTH + 1));
 
 		ResultActions actions = mockMvc.perform(post(COUNTRY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
@@ -210,7 +213,7 @@ public class CountryControllerTest extends CommonControllerTest {
 
 	@Test
 	public void create_WithTooShortFrenchName_ShouldReturnBadRequest() throws Exception {
-		Country country = createValidCountry();
+		Country country = createValidCountryForCreation();
 		country.setNameFr(StringTools.random(TEXT_MIN_LENGTH - 1));
 
 		ResultActions actions = mockMvc.perform(post(COUNTRY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
@@ -220,10 +223,161 @@ public class CountryControllerTest extends CommonControllerTest {
 		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_SHORT.getJsonValue())));
 	}
 
-	private Country createValidCountry() {
+	@Test
+	public void edit_WithValidCountry_ShouldReturnOk() throws Exception {
+		Country country = createValidCountryForEdition();
+		String jsonCountry = asJsonString(country);
+		given(countryService.edit(anyObject(), anyObject())).willReturn(country);
+
+		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCountry));
+		actions.andExpect(status().isOk());
+		Assert.assertEquals(asJsonString(country), actions.andReturn().getResponse().getContentAsString());
+	}
+
+	@Test
+	public void edit_UnknownCountry_ShouldReturnNotFound() throws Exception {
+		Country country = createValidCountryForEdition();
+		String jsonCountry = asJsonString(country);
+		given(countryService.edit(anyObject(), anyObject())).willThrow(new NotFoundException(Field.ID, Country.class.getName()));
+
+		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCountry));
+		actions.andExpect(status().isNotFound());
+		actions.andExpect(jsonPath("$.message", equalTo(NotFoundException.messages.get(Field.ID.name() + Country.class.getName()))));
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.ID.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.NOT_FOUND.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithExistingEnglishName_ShouldReturnBadRequest() throws Exception {
+		Country country = createValidCountryForEdition();
+		given(countryService.edit(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_EN, Country.class.getName()));
+
+		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.message", equalTo(AlreadyExistsException.messages.get(Field.NAME_EN.name() + Country.class.getName()))));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_EN.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.ALREADY_EXISTS.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithExistingFrenchName_ShouldReturnBadRequest() throws Exception {
+		Country country = createValidCountryForEdition();
+		given(countryService.edit(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_FR, Country.class.getName()));
+
+		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.message", equalTo(AlreadyExistsException.messages.get(Field.NAME_FR.name() + Country.class.getName()))));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_FR.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.ALREADY_EXISTS.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithServerException_ShouldReturnInternalServerError() throws Exception {
+		Country country = createValidCountryForEdition();
+		given(countryService.edit(anyObject(), anyObject())).willThrow(new RuntimeException("Message"));
+
+		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
+		actions.andExpect(status().isInternalServerError());
+		actions.andExpect(jsonPath("$.message", equalTo("Message")));
+	}
+
+	@Test
+	public void edit_WithMissingId_ShouldReturnBadRequest() throws Exception {
+		Country country = createValidCountryForEdition();
+		country.setId(null);
+
+		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.ID.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.EMPTY.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithMissingEnglishName_ShouldReturnBadRequest() throws Exception {
+		Country country = createValidCountryForEdition();
+		country.setNameEn(null);
+
+		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_EN.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.EMPTY.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithTooLongEnglishName_ShouldReturnBadRequest() throws Exception {
+		Country country = createValidCountryForEdition();
+		country.setNameEn(StringTools.random(NAME_MAX_LENGTH + 1));
+
+		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_EN.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_LONG.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithTooShortEnglishName_ShouldReturnBadRequest() throws Exception {
+		Country country = createValidCountryForEdition();
+		country.setNameEn(StringTools.random(TEXT_MIN_LENGTH - 1));
+
+		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_EN.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_SHORT.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithMissingFrenchName_ShouldReturnBadRequest() throws Exception {
+		Country country = createValidCountryForEdition();
+		country.setNameFr(null);
+
+		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_FR.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.EMPTY.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithTooLongFrenchName_ShouldReturnBadRequest() throws Exception {
+		Country country = createValidCountryForEdition();
+		country.setNameFr(StringTools.random(NAME_MAX_LENGTH + 1));
+
+		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_FR.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_LONG.getJsonValue())));
+	}
+
+	@Test
+	public void edit_WithTooShortFrenchName_ShouldReturnBadRequest() throws Exception {
+		Country country = createValidCountryForEdition();
+		country.setNameFr(StringTools.random(TEXT_MIN_LENGTH - 1));
+
+		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
+		actions.andExpect(status().isBadRequest());
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_FR.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_SHORT.getJsonValue())));
+	}
+
+	private Country createValidCountryForCreation() {
 		Country country = new Country();
 		country.setNameEn(StringTools.random(NAME_MAX_LENGTH));
 		country.setNameFr(StringTools.random(NAME_MAX_LENGTH));
+		return country;
+	}
+
+	private Country createValidCountryForEdition() {
+		Country country = createValidCountryForCreation();
+		country.setId(1l);
 		return country;
 	}
 }

@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +19,7 @@ import com.web2h.betmates.restapp.core.service.reference.ReferenceService;
 import com.web2h.betmates.restapp.core.service.user.UserService;
 import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.validation.group.CreationChecks;
+import com.web2h.betmates.restapp.model.validation.group.EditionChecks;
 
 /**
  * Venue administration controller.
@@ -39,6 +41,12 @@ public class VenueController extends ReferenceController<Venue> {
 	public ResponseEntity<Object> create(@RequestBody @Validated(CreationChecks.class) Venue venue, BindingResult result) {
 		logger.info("Venue creation" + venue);
 		return super.create(venue, result);
+	}
+
+	@PutMapping
+	public ResponseEntity<Object> edit(@RequestBody @Validated(EditionChecks.class) Venue venue, BindingResult result) {
+		logger.info("Venue edition" + venue);
+		return super.edit(venue, result);
 	}
 
 	@Override

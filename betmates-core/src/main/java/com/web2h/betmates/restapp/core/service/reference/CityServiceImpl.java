@@ -60,4 +60,13 @@ public class CityServiceImpl extends ReferenceServiceImpl<City> implements CityS
 	public ReferenceRepository<City> getRepository() {
 		return cityRepository;
 	}
+
+	@Override
+	public void merge(City existingCity, City newCity) {
+		super.merge(existingCity, newCity);
+		if (!existingCity.getCountry().equals(newCity.getCountry())) {
+			Country newCountry = countryRepository.findOne(newCity.getCountry().getId());
+			existingCity.setCountry(newCountry);
+		}
+	}
 }

@@ -14,12 +14,14 @@ import com.web2h.betmates.restapp.model.validation.ValidationError;
 
 public class InvalidDataException extends Exception {
 
+	public static final String DEFAULT_MESSAGE = "Invalid data was provided";
+
 	private static final long serialVersionUID = 1L;
 
 	private ErrorResponse errorResponse;
 
 	public InvalidDataException(List<ObjectError> errors) {
-		super("Invalid data was provided");
+		super(DEFAULT_MESSAGE);
 		errorResponse = new ErrorResponse(getMessage());
 
 		for (ObjectError error : errors) {
@@ -28,7 +30,7 @@ public class InvalidDataException extends Exception {
 	}
 
 	public InvalidDataException(Field field, ErrorCode errorCode) {
-		super("Invalid data was provided");
+		super(DEFAULT_MESSAGE);
 		errorResponse = new ErrorResponse(getMessage());
 		errorResponse.getErrors().add(new ValidationError(field, errorCode));
 	}

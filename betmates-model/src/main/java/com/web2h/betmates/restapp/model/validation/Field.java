@@ -12,7 +12,6 @@ public enum Field {
 	ALIAS("alias"),
 	CITY("city"),
 	COUNTRY("country"),
-	COUNTRY_ID("country.id"),
 	ID("id"),
 	EMAIL("email"),
 	NAME_EN("nameEn"),

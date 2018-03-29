@@ -11,6 +11,7 @@ import com.web2h.betmates.restapp.model.entity.reference.Reference;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InternalErrorException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
+import com.web2h.betmates.restapp.model.exception.NotFoundException;
 import com.web2h.betmates.restapp.rest.controller.CommonController;
 
 /**
@@ -30,6 +31,15 @@ public abstract class ReferenceController<R extends Reference> extends CommonCon
 		this.referenceService = referenceService;
 	}
 
+	/**
+	 * Creates a new reference.
+	 * 
+	 * @param reference
+	 *            The reference to create
+	 * @param result
+	 *            The binding result for data validation
+	 * @return The response entity
+	 */
 	public ResponseEntity<Object> create(R reference, BindingResult result) {
 		if (result.hasErrors()) {
 			InvalidDataException ide = new InvalidDataException(result.getAllErrors());
@@ -52,6 +62,42 @@ public abstract class ReferenceController<R extends Reference> extends CommonCon
 		}
 
 		return new ResponseEntity<Object>(createdReference, HttpStatus.OK);
+	}
+
+	/**
+	 * Edits a reference.
+	 * 
+	 * @param reference
+	 *            The reference to edit
+	 * @param result
+	 *            The binding result for data validation
+	 * @return The response entity
+	 */
+	public ResponseEntity<Object> edit(R reference, BindingResult result) {
+		if (result.hasErrors()) {
+			InvalidDataException ide = new InvalidDataException(result.getAllErrors());
+			getLogger().warn("Invalid data");
+			return ide.getResponseEntity();
+		}
+
+		R editedReference = null;
+		try {
+			editedReference = referenceService.edit(reference, getLoggedInUser());
+		} catch (NotFoundException nfe) {
+			getLogger().warn(nfe.getMessage());
+			return nfe.getResponseEntity();
+		} catch (InvalidDataException ide) {
+			getLogger().warn(ide.getMessage());
+			return ide.getResponseEntity();
+		} catch (AlreadyExistsException aee) {
+			getLogger().warn(aee.getMessage());
+			return aee.getResponseEntity();
+		} catch (Exception e) {
+			getLogger().error(e.getMessage(), e);
+			return new InternalErrorException(e.getMessage()).getResponseEntity();
+		}
+
+		return new ResponseEntity<Object>(editedReference, HttpStatus.OK);
 	}
 
 	protected abstract Logger getLogger();

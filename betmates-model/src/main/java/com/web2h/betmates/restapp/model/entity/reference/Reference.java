@@ -61,6 +61,14 @@ public abstract class Reference {
 	@JsonDeserialize(using = JsonTrimmerDeserializer.class)
 	private String nameFr;
 
+	public boolean isBeingCreated() {
+		return id == null;
+	}
+
+	public boolean isBeingEdited() {
+		return id != null;
+	}
+
 	@Override
 	public int hashCode() {
 		HashCodeBuilder hcb = new HashCodeBuilder();
