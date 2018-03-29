@@ -49,6 +49,11 @@ public abstract class ReferenceServiceImpl<R extends Reference> implements Refer
 		return existingReference;
 	}
 
+	@Override
+	public R get(Long referenceId) {
+		return getRepository().findOne(referenceId);
+	}
+
 	/**
 	 * Checks if the reference already exists to prevent inserting duplicates.
 	 * 

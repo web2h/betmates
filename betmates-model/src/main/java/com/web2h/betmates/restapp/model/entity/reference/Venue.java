@@ -25,7 +25,7 @@ public class Venue extends Reference {
 
 	/** CITY - City where the venue is located. */
 	@ManyToOne
-	@JoinColumn(name = "city_id", nullable = false)
+	@JoinColumn(name = "city_id")
 	@NotNull
 	private City city;
 
@@ -56,7 +56,7 @@ public class Venue extends Reference {
 
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+		StringBuffer buffer = new StringBuffer("VENUE");
 		buffer.append(super.toString());
 		buffer.append(StringTools.getFieldAndValueToString(Field.CITY, city));
 		return buffer.toString();

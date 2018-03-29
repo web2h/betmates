@@ -14,4 +14,10 @@ import javax.persistence.Table;
 @DiscriminatorValue("COUNTRY")
 public class Country extends Reference {
 
+	@Override
+	public String toString() {
+		StringBuffer buffer = new StringBuffer("COUNTRY");
+		buffer.append(super.toString());
+		return buffer.toString();
+	}
 }

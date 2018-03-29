@@ -38,11 +38,11 @@ public class CityServiceImpl extends ReferenceServiceImpl<City> implements CityS
 	@Override
 	public void checkIfExists(City city) throws AlreadyExistsException {
 		City existingCity = cityRepository.findByNameEnAndCountry(city.getNameEn(), city.getCountry());
-		if (existingCity != null) {
+		if (existingCity != null && (city.isBeingCreated() || !city.getId().equals(existingCity.getId()))) {
 			throw new AlreadyExistsException(Field.NAME_EN, City.class.getName());
 		}
 		existingCity = cityRepository.findByNameFrAndCountry(city.getNameFr(), city.getCountry());
-		if (existingCity != null) {
+		if (existingCity != null && (city.isBeingCreated() || !city.getId().equals(existingCity.getId()))) {
 			throw new AlreadyExistsException(Field.NAME_FR, City.class.getName());
 		}
 	}

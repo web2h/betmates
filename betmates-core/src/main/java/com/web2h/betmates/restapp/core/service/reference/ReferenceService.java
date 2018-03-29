@@ -47,4 +47,13 @@ public interface ReferenceService<R extends Reference> {
 	 *             When wrong data was provided
 	 */
 	R edit(R reference, AppUser editor) throws NotFoundException, AlreadyExistsException, InvalidDataException;
+
+	/**
+	 * Gets a reference.
+	 * 
+	 * @param referenceId
+	 *            Id of the reference to get.
+	 * @return The retrieved reference, null if none could be found
+	 */
+	R get(Long referenceId);
 }

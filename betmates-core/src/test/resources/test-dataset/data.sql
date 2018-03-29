@@ -1,13 +1,11 @@
-INSERT INTO app_users (`id`, `email`, `password`, `first_name`, `last_name`) VALUES (1, 'test.user@email.com', 'password', 'Test', 'User');
+INSERT INTO app_users (`id`, `email`, `password`, `alias`, `role`, `status`) VALUES (1, 'admin@betmates.com', 'password', 'Admin', 'ROLE_ADMINISTRATOR', 'ACTIVE');
 
-INSERT INTO platforms (`id`, `name`) VALUES (1, 'Existing platform');
+INSERT INTO basic_references (`id`, `name_en`, `name_fr`, `discriminator`) VALUES (1, 'France', 'France', 'COUNTRY');
+INSERT INTO basic_references (`id`, `name_en`, `name_fr`, `discriminator`, `country_id`) VALUES (2, 'Paris', 'Paris', 'CITY', 1);
+INSERT INTO basic_references (`id`, `name_en`, `name_fr`, `discriminator`, `country_id`) VALUES (3, 'Lille', 'Lille', 'CITY', 1);
+INSERT INTO basic_references (`id`, `name_en`, `name_fr`, `discriminator`, `city_id`) VALUES (4, 'Parc des Princes', 'Parc des Princes', 'VENUE', 2);
+INSERT INTO basic_references (`id`, `name_en`, `name_fr`, `discriminator`, `city_id`) VALUES (5, 'Stade Charléty', 'Stade Charléty', 'VENUE', 2);
 
-INSERT INTO platform_supervisors (`platform_id`, `app_user_id`, `administrator`, `function`, `nickname`) VALUES (1, 1, 'Y', 'TEACHER', 'Prof Test');
-
-INSERT INTO log_events (`id`, `platform_id`, `app_user_id`, `event_ts`, `event_type`) VALUES (1, 1, 1, '2018-03-02 18:00:00', 'PLATFORM_CREATION');
-INSERT INTO log_events (`id`, `platform_id`, `app_user_id`, `event_ts`, `event_type`) VALUES (2, 1, 1, '2018-03-02 18:00:01', 'SUPERVISOR_ADDITION');
-
-INSERT INTO log_event_changes (`id`, `log_event_id`, `field`, `old_value`, `new_value`) VALUES (1, 1, 'name', null, 'Existing platform');
-INSERT INTO log_event_changes (`id`, `log_event_id`, `field`, `old_value`, `new_value`) VALUES (2, 2, 'administrator', null, 'true');
-INSERT INTO log_event_changes (`id`, `log_event_id`, `field`, `old_value`, `new_value`) VALUES (3, 2, 'function', null, 'TEACHER');
-INSERT INTO log_event_changes (`id`, `log_event_id`, `field`, `old_value`, `new_value`) VALUES (4, 2, 'nickname', null, 'Prof Test');
+INSERT INTO basic_references (`id`, `name_en`, `name_fr`, `discriminator`) VALUES (6, 'Belgium', 'Belgique', 'COUNTRY');
+INSERT INTO basic_references (`id`, `name_en`, `name_fr`, `discriminator`, `country_id`) VALUES (7, 'Brussels', 'Bruxelles', 'CITY', 6);
+INSERT INTO basic_references (`id`, `name_en`, `name_fr`, `discriminator`, `city_id`) VALUES (8, 'Stade du Roi Baudouin', 'Stade du Roi Baudoin', 'VENUE', 7);

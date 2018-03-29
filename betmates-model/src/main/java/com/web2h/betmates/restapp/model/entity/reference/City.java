@@ -25,7 +25,7 @@ public class City extends Reference {
 
 	/** COUNTRY - Country where the city is located. */
 	@ManyToOne
-	@JoinColumn(name = "country_id", nullable = false)
+	@JoinColumn(name = "country_id")
 	@NotNull
 	private Country country;
 
@@ -56,7 +56,7 @@ public class City extends Reference {
 
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+		StringBuffer buffer = new StringBuffer("CITY");
 		buffer.append(super.toString());
 		buffer.append(StringTools.getFieldAndValueToString(Field.COUNTRY, country));
 		return buffer.toString();

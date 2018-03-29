@@ -1,4 +1,4 @@
-package com.web2h.potacrayons.service;
+package com.web2h.betmates.restapp.core.service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

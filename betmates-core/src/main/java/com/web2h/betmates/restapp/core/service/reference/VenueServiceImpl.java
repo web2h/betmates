@@ -38,11 +38,11 @@ public class VenueServiceImpl extends ReferenceServiceImpl<Venue> implements Ven
 	@Override
 	public void checkIfExists(Venue venue) throws AlreadyExistsException {
 		Venue existingVenue = venueRepository.findByNameEnAndCity(venue.getNameEn(), venue.getCity());
-		if (existingVenue != null) {
+		if (existingVenue != null && (venue.isBeingCreated() || !venue.getId().equals(existingVenue.getId()))) {
 			throw new AlreadyExistsException(Field.NAME_EN, Venue.class.getName());
 		}
 		existingVenue = venueRepository.findByNameFrAndCity(venue.getNameFr(), venue.getCity());
-		if (existingVenue != null) {
+		if (existingVenue != null && (venue.isBeingCreated() || !venue.getId().equals(existingVenue.getId()))) {
 			throw new AlreadyExistsException(Field.NAME_FR, Venue.class.getName());
 		}
 	}

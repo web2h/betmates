@@ -27,11 +27,11 @@ public class CountryServiceImpl extends ReferenceServiceImpl<Country> implements
 	@Override
 	public void checkIfExists(Country country) throws AlreadyExistsException {
 		Country existingCountry = getRepository().findByNameEn(country.getNameEn());
-		if (existingCountry != null && country.isBeingCreated() || !country.getId().equals(existingCountry.getId())) {
+		if (existingCountry != null && (country.isBeingCreated() || !country.getId().equals(existingCountry.getId()))) {
 			throw new AlreadyExistsException(Field.NAME_EN, Country.class.getName());
 		}
 		existingCountry = getRepository().findByNameFr(country.getNameFr());
-		if (existingCountry != null && country.isBeingCreated() || !country.getId().equals(existingCountry.getId())) {
+		if (existingCountry != null && (country.isBeingCreated() || !country.getId().equals(existingCountry.getId()))) {
 			throw new AlreadyExistsException(Field.NAME_FR, Country.class.getName());
 		}
 	}
