@@ -20,6 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.web2h.betmates.restapp.core.service.CommonTest;
 import com.web2h.betmates.restapp.model.entity.log.LogEventType;
 import com.web2h.betmates.restapp.model.entity.reference.City;
+import com.web2h.betmates.restapp.model.entity.reference.Country;
 import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEvent;
 import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEventChange;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
@@ -125,6 +126,22 @@ public class CityServiceTest extends CommonTest {
 			}
 		}
 		assertEquals(log.get(0).getChanges().size(), changeCount);
+	}
+
+	@Test
+	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
+	public void create_WithNewCityAndOnlyCountryId_SucceedAndReturnWholeCountry() throws AlreadyExistsException, InvalidDataException {
+		City city = new City();
+		city.setNameEn("Marseille");
+		city.setNameFr("Marseille");
+		city.setCountry(new Country());
+		city.getCountry().setId(france.getId());
+		city.getCountry().setNameFr(null);
+
+		City createdCity = sut.create(city, admin);
+		assertNotNull(createdCity.getId());
+		assertEquals(france.getNameEn(), createdCity.getCountry().getNameEn());
+		assertEquals(france.getNameFr(), createdCity.getCountry().getNameFr());
 	}
 
 	@Test(expected = NullPointerException.class)

@@ -19,6 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.web2h.betmates.restapp.core.service.CommonTest;
 import com.web2h.betmates.restapp.model.entity.log.LogEventType;
+import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEvent;
 import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEventChange;
@@ -125,6 +126,21 @@ public class VenueServiceTest extends CommonTest {
 		assertEquals(log.get(0).getChanges().size(), changeCount);
 	}
 
+	@Test
+	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
+	public void create_WithNewVenueWithOnlyCityId_SucceedAndReturnWholeCity() throws AlreadyExistsException, InvalidDataException {
+		Venue venue = new Venue();
+		venue.setNameEn("Bercy");
+		venue.setNameFr("Bercy");
+		venue.setCity(new City());
+		venue.getCity().setId(paris.getId());
+
+		Venue createdVenue = sut.create(venue, admin);
+		assertNotNull(createdVenue.getId());
+		assertEquals(paris.getNameEn(), createdVenue.getCity().getNameEn());
+		assertEquals(paris.getNameFr(), createdVenue.getCity().getNameFr());
+	}
+
 	@Test(expected = NullPointerException.class)
 	public void edit_WithNullVenue_ThrowNullPointerException() throws Exception {
 		sut.edit(null, new AppUser());
@@ -197,5 +213,20 @@ public class VenueServiceTest extends CommonTest {
 			}
 		}
 		assertEquals(log.get(0).getChanges().size(), changeCount);
+	}
+
+	@Test
+	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
+	public void edit_WithNewValuesButOnlyCityId_SucceedAndReturnWholeCity() throws Exception {
+		parcDesPrinces.setNameEn("Bercy");
+		parcDesPrinces.setNameFr("Bercy");
+		parcDesPrinces.setCity(new City());
+		parcDesPrinces.getCity().setId(lille.getId());
+
+		Venue editedVenue = sut.edit(parcDesPrinces, admin);
+		assertEquals(new Long(4), editedVenue.getId());
+		assertEquals(sut.get(parcDesPrinces.getId()), parcDesPrinces);
+		assertEquals(lille.getNameEn(), editedVenue.getCity().getNameEn());
+		assertEquals(lille.getNameFr(), editedVenue.getCity().getNameFr());
 	}
 }
