@@ -1,6 +1,9 @@
 package com.web2h.betmates.restapp.core.service.reference;
 
+import java.util.List;
+
 import com.web2h.betmates.restapp.model.entity.reference.Reference;
+import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEvent;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
@@ -56,4 +59,13 @@ public interface ReferenceService<R extends Reference> {
 	 * @return The retrieved reference, null if none could be found
 	 */
 	R get(Long referenceId);
+
+	/**
+	 * Gets the event log for the given reference.
+	 * 
+	 * @param referenceId
+	 *            Id of the reference we want to get the log for
+	 * @return The list of log events
+	 */
+	List<ReferenceLogEvent> getLog(Long referenceId);
 }

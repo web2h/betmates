@@ -1,5 +1,6 @@
 package com.web2h.betmates.restapp.model.entity.reference.log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -24,15 +25,18 @@ public class ReferenceLogEvent extends LogEvent {
 	private Reference reference;
 
 	/** CHANGES - Changes made on this element. */
-	@OneToMany(mappedBy = "logEvent")
+	@OneToMany(mappedBy = "logEvent", cascade = CascadeType.ALL)
 	private List<ReferenceLogEventChange> changes;
 
 	public ReferenceLogEvent() {
 
 	}
 
-	public ReferenceLogEvent(LogEventType type, AppUser appUser) {
+	public ReferenceLogEvent(Reference reference, LogEventType type, AppUser appUser) {
 		super(type, appUser);
+		this.reference = reference;
+
+		changes = new ArrayList<>();
 	}
 
 	public Reference getReference() {

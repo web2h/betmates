@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.web2h.betmates.restapp.core.service.log.ReferenceLogService;
 import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
@@ -30,7 +31,8 @@ public class CityServiceImpl extends ReferenceServiceImpl<City> implements CityS
 
 	private Logger logger = LoggerFactory.getLogger(CityServiceImpl.class);
 
-	public CityServiceImpl(CityRepository cityRepository, CountryRepository countryRepository) {
+	public CityServiceImpl(CityRepository cityRepository, CountryRepository countryRepository, ReferenceLogService referenceLogService) {
+		super(referenceLogService);
 		this.cityRepository = cityRepository;
 		this.countryRepository = countryRepository;
 	}
@@ -54,6 +56,7 @@ public class CityServiceImpl extends ReferenceServiceImpl<City> implements CityS
 			logger.warn("No country exists with the given ID [" + city.getCountry().getId() + "]");
 			throw new InvalidDataException(Field.COUNTRY, ErrorCode.NOT_FOUND);
 		}
+		city.setCountry(country);
 	}
 
 	@Override

@@ -2,8 +2,11 @@ package com.web2h.betmates.restapp.core.service.reference;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +18,10 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.web2h.betmates.restapp.core.service.CommonTest;
+import com.web2h.betmates.restapp.model.entity.log.LogEventType;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
+import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEvent;
+import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEventChange;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
@@ -89,11 +95,29 @@ public class CountryServiceTest extends CommonTest {
 		country.setNameEn("Russia");
 		country.setNameFr("Russie");
 
-		// TODO Check logs
-
 		Country createdCountry = sut.create(country, admin);
 		assertNotNull(createdCountry.getId());
 		assertEquals(country, createdCountry);
+
+		List<ReferenceLogEvent> log = sut.getLog(createdCountry.getId());
+		assertEquals(1, log.size());
+		assertEquals(LogEventType.CREATION, log.get(0).getType());
+		assertEquals(createdCountry, log.get(0).getReference());
+		assertEquals(admin, log.get(0).getAppUser());
+		assertEquals(2, log.get(0).getChanges().size());
+		int changeCount = 0;
+		for (ReferenceLogEventChange change : log.get(0).getChanges()) {
+			if (Field.NAME_EN.equals(change.getField())) {
+				assertNull(change.getOldValue());
+				assertEquals(createdCountry.getNameEn(), change.getNewValue());
+				changeCount++;
+			} else if (Field.NAME_FR.equals(change.getField())) {
+				assertNull(change.getOldValue());
+				assertEquals(createdCountry.getNameFr(), change.getNewValue());
+				changeCount++;
+			}
+		}
+		assertEquals(log.get(0).getChanges().size(), changeCount);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -140,10 +164,28 @@ public class CountryServiceTest extends CommonTest {
 		france.setNameEn("Russia");
 		france.setNameFr("Russie");
 
-		// TODO Check logs
-
 		Country editedCountry = sut.edit(france, admin);
 		assertEquals(new Long(1), editedCountry.getId());
 		assertEquals(sut.get(france.getId()), france);
+
+		List<ReferenceLogEvent> log = sut.getLog(editedCountry.getId());
+		assertEquals(2, log.size());
+		assertEquals(LogEventType.EDITION, log.get(0).getType());
+		assertEquals(editedCountry, log.get(0).getReference());
+		assertEquals(admin, log.get(0).getAppUser());
+		assertEquals(2, log.get(0).getChanges().size());
+		int changeCount = 0;
+		for (ReferenceLogEventChange change : log.get(0).getChanges()) {
+			if (Field.NAME_EN.equals(change.getField())) {
+				assertEquals("France", change.getOldValue());
+				assertEquals(editedCountry.getNameEn(), change.getNewValue());
+				changeCount++;
+			} else if (Field.NAME_FR.equals(change.getField())) {
+				assertEquals("France", change.getOldValue());
+				assertEquals(editedCountry.getNameFr(), change.getNewValue());
+				changeCount++;
+			}
+		}
+		assertEquals(log.get(0).getChanges().size(), changeCount);
 	}
 }

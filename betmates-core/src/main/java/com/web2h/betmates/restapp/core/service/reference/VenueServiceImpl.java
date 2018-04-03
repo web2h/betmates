@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.web2h.betmates.restapp.core.service.log.ReferenceLogService;
 import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
@@ -30,7 +31,8 @@ public class VenueServiceImpl extends ReferenceServiceImpl<Venue> implements Ven
 
 	private Logger logger = LoggerFactory.getLogger(VenueServiceImpl.class);
 
-	public VenueServiceImpl(VenueRepository venueRepository, CityRepository cityRepository) {
+	public VenueServiceImpl(VenueRepository venueRepository, CityRepository cityRepository, ReferenceLogService referenceLogService) {
+		super(referenceLogService);
 		this.venueRepository = venueRepository;
 		this.cityRepository = cityRepository;
 	}
@@ -54,6 +56,7 @@ public class VenueServiceImpl extends ReferenceServiceImpl<Venue> implements Ven
 			logger.warn("No city exists with the given ID [" + venue.getCity().getId() + "]");
 			throw new InvalidDataException(Field.CITY, ErrorCode.NOT_FOUND);
 		}
+		venue.setCity(city);
 	}
 
 	@Override

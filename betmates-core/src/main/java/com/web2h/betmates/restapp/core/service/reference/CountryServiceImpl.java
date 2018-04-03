@@ -3,6 +3,7 @@ package com.web2h.betmates.restapp.core.service.reference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.web2h.betmates.restapp.core.service.log.ReferenceLogService;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.validation.Field;
@@ -20,7 +21,8 @@ public class CountryServiceImpl extends ReferenceServiceImpl<Country> implements
 
 	private CountryRepository countryRepository;
 
-	public CountryServiceImpl(CountryRepository countryRepository) {
+	public CountryServiceImpl(CountryRepository countryRepository, ReferenceLogService referenceLogService) {
+		super(referenceLogService);
 		this.countryRepository = countryRepository;
 	}
 

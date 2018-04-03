@@ -2,8 +2,11 @@ package com.web2h.betmates.restapp.core.service.reference;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +18,10 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.web2h.betmates.restapp.core.service.CommonTest;
+import com.web2h.betmates.restapp.model.entity.log.LogEventType;
 import com.web2h.betmates.restapp.model.entity.reference.City;
+import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEvent;
+import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEventChange;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
@@ -92,11 +98,33 @@ public class CityServiceTest extends CommonTest {
 		city.setNameFr("Marseille");
 		city.setCountry(france);
 
-		// TODO Check logs
-
 		City createdCity = sut.create(city, admin);
 		assertNotNull(createdCity.getId());
 		assertEquals(city, createdCity);
+
+		List<ReferenceLogEvent> log = sut.getLog(createdCity.getId());
+		assertEquals(1, log.size());
+		assertEquals(LogEventType.CREATION, log.get(0).getType());
+		assertEquals(createdCity, log.get(0).getReference());
+		assertEquals(admin, log.get(0).getAppUser());
+		assertEquals(3, log.get(0).getChanges().size());
+		int changeCount = 0;
+		for (ReferenceLogEventChange change : log.get(0).getChanges()) {
+			if (Field.NAME_EN.equals(change.getField())) {
+				assertNull(change.getOldValue());
+				assertEquals(createdCity.getNameEn(), change.getNewValue());
+				changeCount++;
+			} else if (Field.NAME_FR.equals(change.getField())) {
+				assertNull(change.getOldValue());
+				assertEquals(createdCity.getNameFr(), change.getNewValue());
+				changeCount++;
+			} else if (Field.COUNTRY.equals(change.getField())) {
+				assertNull(change.getOldValue());
+				assertEquals(createdCity.getCountry().getLogValue(), change.getNewValue());
+				changeCount++;
+			}
+		}
+		assertEquals(log.get(0).getChanges().size(), changeCount);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -143,10 +171,28 @@ public class CityServiceTest extends CommonTest {
 		lille.setNameEn("Marseille");
 		lille.setNameFr("Marseille");
 
-		// TODO Check logs
-
 		City editedCity = sut.edit(lille, admin);
 		assertEquals(new Long(3), editedCity.getId());
 		assertEquals(sut.get(lille.getId()), lille);
+
+		List<ReferenceLogEvent> log = sut.getLog(editedCity.getId());
+		assertEquals(2, log.size());
+		assertEquals(LogEventType.EDITION, log.get(0).getType());
+		assertEquals(editedCity, log.get(0).getReference());
+		assertEquals(admin, log.get(0).getAppUser());
+		assertEquals(2, log.get(0).getChanges().size());
+		int changeCount = 0;
+		for (ReferenceLogEventChange change : log.get(0).getChanges()) {
+			if (Field.NAME_EN.equals(change.getField())) {
+				assertEquals("Lille", change.getOldValue());
+				assertEquals(editedCity.getNameEn(), change.getNewValue());
+				changeCount++;
+			} else if (Field.NAME_FR.equals(change.getField())) {
+				assertEquals("Lille", change.getOldValue());
+				assertEquals(editedCity.getNameFr(), change.getNewValue());
+				changeCount++;
+			}
+		}
+		assertEquals(log.get(0).getChanges().size(), changeCount);
 	}
 }

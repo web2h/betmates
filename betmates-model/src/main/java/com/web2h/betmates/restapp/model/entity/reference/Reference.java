@@ -62,10 +62,12 @@ public abstract class Reference {
 	@JsonDeserialize(using = JsonTrimmerDeserializer.class)
 	private String nameFr;
 
+	@JsonIgnore
 	public boolean isBeingCreated() {
 		return id == null;
 	}
 
+	@JsonIgnore
 	public boolean isBeingEdited() {
 		return id != null;
 	}

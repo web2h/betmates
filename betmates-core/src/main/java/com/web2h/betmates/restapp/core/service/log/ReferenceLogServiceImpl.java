@@ -1,8 +1,13 @@
 package com.web2h.betmates.restapp.core.service.log;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.web2h.betmates.restapp.model.entity.log.LogEventType;
 import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Reference;
+import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEvent;
 import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEventChange;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
@@ -14,6 +19,7 @@ import com.web2h.betmates.restapp.persistence.repository.log.ReferenceLogEventRe
  * 
  * @author web2h
  */
+@Service
 public class ReferenceLogServiceImpl implements ReferenceLogService {
 
 	private ReferenceLogEventRepository referenceLogEventRepository;
@@ -23,30 +29,47 @@ public class ReferenceLogServiceImpl implements ReferenceLogService {
 	}
 
 	@Override
+	public List<ReferenceLogEvent> getLog(Long referenceId) {
+		return referenceLogEventRepository.findByReference_idOrderByTimestampDesc(referenceId);
+	}
+
+	@Override
 	public void logCreation(Reference reference, AppUser creator) {
-		ReferenceLogEvent event = new ReferenceLogEvent(LogEventType.CREATION, creator);
+		ReferenceLogEvent event = new ReferenceLogEvent(reference, LogEventType.CREATION, creator);
 
-		ReferenceLogEventChange changeNameEn = new ReferenceLogEventChange();
-		changeNameEn.setField(Field.NAME_EN);
-		changeNameEn.setNewValue(reference.getNameEn());
-		changeNameEn.setLogEvent(event);
-
-		ReferenceLogEventChange changeNameFr = new ReferenceLogEventChange();
-		changeNameFr.setField(Field.NAME_FR);
-		changeNameFr.setNewValue(reference.getNameFr());
-		changeNameFr.setLogEvent(event);
+		event.getChanges().add(new ReferenceLogEventChange(event, Field.NAME_EN, reference.getNameEn()));
+		event.getChanges().add(new ReferenceLogEventChange(event, Field.NAME_FR, reference.getNameFr()));
 
 		if (reference instanceof City) {
-			ReferenceLogEventChange changeCountry = new ReferenceLogEventChange();
-			changeCountry.setField(Field.COUNTRY);
-			changeCountry.setNewValue(((City) reference).getCountry().getLogValue());
-			changeCountry.setLogEvent(event);
+			event.getChanges().add(new ReferenceLogEventChange(event, Field.COUNTRY, ((City) reference).getCountry().getLogValue()));
 		}
 
-		event.getChanges().add(changeNameEn);
-		event.getChanges().add(changeNameFr);
+		if (reference instanceof Venue) {
+			event.getChanges().add(new ReferenceLogEventChange(event, Field.CITY, ((Venue) reference).getCity().getLogValue()));
+		}
 
 		referenceLogEventRepository.save(event);
 	}
 
+	@Override
+	public void logEdition(Reference oldReference, Reference newReference, AppUser editor) {
+		ReferenceLogEvent event = new ReferenceLogEvent(oldReference, LogEventType.EDITION, editor);
+
+		if (!oldReference.getNameEn().equals(newReference.getNameEn())) {
+			event.getChanges().add(new ReferenceLogEventChange(event, Field.NAME_EN, newReference.getNameEn(), oldReference.getNameEn()));
+		}
+		if (!oldReference.getNameFr().equals(newReference.getNameFr())) {
+			event.getChanges().add(new ReferenceLogEventChange(event, Field.NAME_FR, newReference.getNameFr(), oldReference.getNameFr()));
+		}
+
+		if (oldReference instanceof City && !((City) oldReference).getCountry().equals(((City) newReference).getCountry())) {
+			event.getChanges().add(new ReferenceLogEventChange(event, Field.COUNTRY, ((City) newReference).getCountry().getLogValue(), ((City) oldReference).getCountry().getLogValue()));
+		}
+
+		if (oldReference instanceof Venue && !((Venue) oldReference).getCity().equals(((Venue) newReference).getCity())) {
+			event.getChanges().add(new ReferenceLogEventChange(event, Field.CITY, ((Venue) newReference).getCity().getLogValue(), ((Venue) oldReference).getCity().getLogValue()));
+		}
+
+		referenceLogEventRepository.save(event);
+	}
 }

@@ -1,7 +1,11 @@
 package com.web2h.betmates.restapp.core.service.reference;
 
+import java.util.List;
+
 import com.google.common.base.Preconditions;
+import com.web2h.betmates.restapp.core.service.log.ReferenceLogService;
 import com.web2h.betmates.restapp.model.entity.reference.Reference;
+import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEvent;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
@@ -16,6 +20,12 @@ import com.web2h.betmates.restapp.persistence.repository.reference.ReferenceRepo
  */
 public abstract class ReferenceServiceImpl<R extends Reference> implements ReferenceService<R> {
 
+	private ReferenceLogService referenceLogService;
+
+	public ReferenceServiceImpl(ReferenceLogService referenceLogService) {
+		this.referenceLogService = referenceLogService;
+	}
+
 	@Override
 	public R create(R reference, AppUser creator) throws AlreadyExistsException, InvalidDataException {
 		Preconditions.checkNotNull(reference);
@@ -24,7 +34,7 @@ public abstract class ReferenceServiceImpl<R extends Reference> implements Refer
 		checkIfLinkedReferenceExists(reference);
 		checkIfExists(reference);
 
-		// TODO Log creation
+		referenceLogService.logCreation(reference, creator);
 
 		getRepository().save(reference);
 		return reference;
@@ -40,9 +50,10 @@ public abstract class ReferenceServiceImpl<R extends Reference> implements Refer
 			throw new NotFoundException(Field.ID, reference.getClass().getName());
 		}
 
+		checkIfLinkedReferenceExists(reference);
 		checkIfExists(reference);
 
-		// TODO Log edition
+		referenceLogService.logEdition(existingReference, reference, editor);
 
 		merge(existingReference, reference);
 		getRepository().save(existingReference);
@@ -52,6 +63,11 @@ public abstract class ReferenceServiceImpl<R extends Reference> implements Refer
 	@Override
 	public R get(Long referenceId) {
 		return getRepository().findOne(referenceId);
+	}
+
+	@Override
+	public List<ReferenceLogEvent> getLog(Long referenceId) {
+		return referenceLogService.getLog(referenceId);
 	}
 
 	/**

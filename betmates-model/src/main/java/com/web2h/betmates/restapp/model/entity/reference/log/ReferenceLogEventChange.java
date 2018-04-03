@@ -6,6 +6,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.web2h.betmates.restapp.model.entity.log.LogEventChange;
+import com.web2h.betmates.restapp.model.validation.Field;
 
 @Entity
 @Table(name = "reference_log_event_changes")
@@ -15,6 +16,19 @@ public class ReferenceLogEventChange extends LogEventChange {
 	@ManyToOne
 	@JoinColumn(name = "log_event_id", nullable = false)
 	private ReferenceLogEvent logEvent;
+
+	public ReferenceLogEventChange(ReferenceLogEvent logEvent, Field field, String newValue) {
+		this.logEvent = logEvent;
+		setField(field);
+		setNewValue(newValue);
+	}
+
+	public ReferenceLogEventChange(ReferenceLogEvent logEvent, Field field, String newValue, String oldValue) {
+		this.logEvent = logEvent;
+		setField(field);
+		setNewValue(newValue);
+		setOldValue(oldValue);
+	}
 
 	public ReferenceLogEvent getLogEvent() {
 		return logEvent;
