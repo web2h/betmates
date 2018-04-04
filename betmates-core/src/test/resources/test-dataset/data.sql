@@ -31,3 +31,7 @@ INSERT INTO reference_log_event_changes (`id`, `log_event_id`, `field`, `new_val
 
 INSERT INTO competitions (`id`, `name_en`, `name_fr`, `competition_type`, `start_date`) VALUES (1, 'Russia 2018', 'Russie 2018', 'FIFA_WORLD_CUP', '2018-06-10 20:00:00');
 INSERT INTO competitions (`id`, `name_en`, `name_fr`, `competition_type`, `start_date`) VALUES (2, 'NBA Playoffs 2018', 'NBA Playoffs 2018', 'NBA_PLAYOFFS', '2018-04-15 20:00:00');
+
+INSERT INTO competition_log_events (`id`, `app_user_id`, `event_ts`, `event_type`, `competition_id`) VALUES (1, 1, '2018-04-02 18:00:02', 'CREATION', 1);
+
+INSERT INTO competition_log_events (`id`, `app_user_id`, `event_ts`, `event_type`, `competition_id`) VALUES (2, 1, '2018-04-02 18:00:03', 'CREATION', 2);

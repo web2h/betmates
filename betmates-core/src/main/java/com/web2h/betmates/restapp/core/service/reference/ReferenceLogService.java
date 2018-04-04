@@ -1,4 +1,4 @@
-package com.web2h.betmates.restapp.core.service.log;
+package com.web2h.betmates.restapp.core.service.reference;
 
 import java.util.List;
 

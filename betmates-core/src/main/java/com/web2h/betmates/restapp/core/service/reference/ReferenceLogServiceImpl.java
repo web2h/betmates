@@ -1,4 +1,4 @@
-package com.web2h.betmates.restapp.core.service.log;
+package com.web2h.betmates.restapp.core.service.reference;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEvent;
 import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEventChange;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.validation.Field;
-import com.web2h.betmates.restapp.persistence.repository.log.ReferenceLogEventRepository;
+import com.web2h.betmates.restapp.persistence.repository.reference.ReferenceLogEventRepository;
 
 /**
  * Log service implementation class for events on references.

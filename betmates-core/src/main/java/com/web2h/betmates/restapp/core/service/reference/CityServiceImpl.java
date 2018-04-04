@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.web2h.betmates.restapp.core.service.log.ReferenceLogService;
 import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;

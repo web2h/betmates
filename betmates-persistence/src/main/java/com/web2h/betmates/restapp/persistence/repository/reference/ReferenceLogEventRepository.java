@@ -1,4 +1,4 @@
-package com.web2h.betmates.restapp.persistence.repository.log;
+package com.web2h.betmates.restapp.persistence.repository.reference;
 
 import java.util.List;
 

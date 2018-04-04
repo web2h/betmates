@@ -7,9 +7,20 @@ package com.web2h.betmates.restapp.model.entity.competition;
  */
 public enum CompetitionType {
 
-	FIFA_WORLD_CUP,
-	NBA_PLAYOFFS,
-	NHL_PLAYOFFS,
-	UEFA_CHAMPIONS_LEAGUE,
-	UEFA_EURO
+	FIFA_WORLD_CUP("FIFA World Cup"),
+	NBA_PLAYOFFS("NBA Playoffs"),
+	NHL_PLAYOFFS("NHL Playoffs"),
+	UEFA_CHAMPIONS_LEAGUE("UEFA Champion's League"),
+	UEFA_EURO("UEFA Euro");
+
+	private String value;
+
+	private CompetitionType(String value) {
+		this.value = value;
+	}
+
+	@Override
+	public String toString() {
+		return value;
+	}
 }

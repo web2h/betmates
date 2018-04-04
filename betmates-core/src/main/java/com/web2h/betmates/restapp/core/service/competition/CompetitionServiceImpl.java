@@ -1,11 +1,14 @@
 package com.web2h.betmates.restapp.core.service.competition;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Preconditions;
 import com.web2h.betmates.restapp.model.entity.competition.Competition;
+import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEvent;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.NotFoundException;
@@ -23,8 +26,11 @@ public class CompetitionServiceImpl implements CompetitionService {
 
 	private CompetitionRepository competitionRepository;
 
-	public CompetitionServiceImpl(CompetitionRepository competitionRepository) {
+	private CompetitionLogService competitionLogService;
+
+	public CompetitionServiceImpl(CompetitionRepository competitionRepository, CompetitionLogService competitionLogService) {
 		this.competitionRepository = competitionRepository;
+		this.competitionLogService = competitionLogService;
 	}
 
 	@Override
@@ -34,7 +40,7 @@ public class CompetitionServiceImpl implements CompetitionService {
 
 		checkIfExists(competition);
 
-		// TODO log creation
+		competitionLogService.logCreation(competition, creator);
 
 		competitionRepository.save(competition);
 		return competition;
@@ -52,7 +58,7 @@ public class CompetitionServiceImpl implements CompetitionService {
 
 		checkIfExists(competition);
 
-		// TODO log edition
+		competitionLogService.logEdition(existingCompetition, competition, editor);
 
 		merge(existingCompetition, competition);
 		competitionRepository.save(competition);
@@ -62,6 +68,11 @@ public class CompetitionServiceImpl implements CompetitionService {
 	@Override
 	public Competition get(Long competitionId) {
 		return competitionRepository.findOne(competitionId);
+	}
+
+	@Override
+	public List<CompetitionLogEvent> getLog(Long competitionId) {
+		return competitionLogService.getLog(competitionId);
 	}
 
 	/**

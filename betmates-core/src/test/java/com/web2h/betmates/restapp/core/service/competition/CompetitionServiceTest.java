@@ -2,12 +2,15 @@ package com.web2h.betmates.restapp.core.service.competition;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +22,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.web2h.betmates.restapp.core.service.CommonTest;
 import com.web2h.betmates.restapp.model.entity.competition.Competition;
 import com.web2h.betmates.restapp.model.entity.competition.CompetitionType;
+import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEvent;
+import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEventChange;
+import com.web2h.betmates.restapp.model.entity.log.LogEventType;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
 import com.web2h.betmates.restapp.model.validation.Field;
+import com.web2h.tools.DateTools;
 
 /**
  * Competition service test class.
@@ -35,6 +42,21 @@ public class CompetitionServiceTest extends CommonTest {
 
 	@Autowired
 	private CompetitionService sut;
+
+	private Date someDate;
+
+	private Date someDate2;
+
+	@Before
+	public void before() {
+		super.before();
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(2018, Calendar.JUNE, 10, 20, 00, 00);
+		someDate = calendar.getTime();
+
+		calendar.set(2020, Calendar.JUNE, 10, 20, 00, 00);
+		someDate2 = calendar.getTime();
+	}
 
 	@Test(expected = NullPointerException.class)
 	public void create_WithNullCompetition_ThrowNullPointerException() throws AlreadyExistsException, InvalidDataException {
@@ -85,15 +107,34 @@ public class CompetitionServiceTest extends CommonTest {
 		assertNotNull(createdCompetition.getId());
 		assertEquals(competition, createdCompetition);
 
-		// TODO Test logs
-		/*
-		 * List<ReferenceLogEvent> log = sut.getLog(createdCountry.getId()); assertEquals(1, log.size()); assertEquals(LogEventType.CREATION, log.get(0).getType());
-		 * assertEquals(createdCountry, log.get(0).getReference()); assertEquals(admin, log.get(0).getAppUser()); assertEquals(2, log.get(0).getChanges().size()); int
-		 * changeCount = 0; for (ReferenceLogEventChange change : log.get(0).getChanges()) { if (Field.NAME_EN.equals(change.getField())) {
-		 * assertNull(change.getOldValue()); assertEquals(createdCountry.getNameEn(), change.getNewValue()); changeCount++; } else if
-		 * (Field.NAME_FR.equals(change.getField())) { assertNull(change.getOldValue()); assertEquals(createdCountry.getNameFr(), change.getNewValue()); changeCount++;
-		 * } } assertEquals(log.get(0).getChanges().size(), changeCount);
-		 */
+		List<CompetitionLogEvent> log = sut.getLog(createdCompetition.getId());
+		assertEquals(1, log.size());
+		assertEquals(LogEventType.CREATION, log.get(0).getType());
+		assertEquals(createdCompetition, log.get(0).getCompetition());
+		assertEquals(admin, log.get(0).getAppUser());
+		assertEquals(4, log.get(0).getChanges().size());
+		int changeCount = 0;
+		for (CompetitionLogEventChange change : log.get(0).getChanges()) {
+			if (Field.NAME_EN.equals(change.getField())) {
+				assertNull(change.getOldValue());
+				assertEquals(createdCompetition.getNameEn(), change.getNewValue());
+				changeCount++;
+			} else if (Field.NAME_FR.equals(change.getField())) {
+				assertNull(change.getOldValue());
+				assertEquals(createdCompetition.getNameFr(), change.getNewValue());
+				changeCount++;
+			} else if (Field.TYPE.equals(change.getField())) {
+				assertNull(change.getOldValue());
+				assertEquals(createdCompetition.getType().toString(), change.getNewValue());
+				changeCount++;
+			} else if (Field.START_DATE.equals(change.getField())) {
+				assertNull(change.getOldValue());
+				assertEquals(DateTools.toString(someDate), change.getNewValue());
+				changeCount++;
+			}
+		}
+		assertEquals(log.get(0).getChanges().size(), changeCount);
+
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -140,31 +181,42 @@ public class CompetitionServiceTest extends CommonTest {
 		worldCup2018.setNameEn("Russia World Cup 2020");
 		worldCup2018.setNameFr("Coupe du monde Russie 2020");
 		worldCup2018.setType(CompetitionType.UEFA_EURO);
-
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.YEAR, 2020);
-		calendar.set(Calendar.MONTH, Calendar.JUNE);
-		calendar.set(Calendar.DAY_OF_MONTH, 10);
-		calendar.set(2020, Calendar.JUNE, 10, 20, 0, 0);
-		Date newStartDate = calendar.getTime();
-		worldCup2018.setStartDate(newStartDate);
+		worldCup2018.setStartDate(someDate2);
 
 		Competition editedCompetition = sut.edit(worldCup2018, admin);
 		assertEquals(new Long(1), editedCompetition.getId());
 		Competition updatedCompetition = sut.get(worldCup2018.getId());
 		assertEquals(updatedCompetition, worldCup2018);
-		assertEquals(newStartDate, updatedCompetition.getStartDate());
+		assertEquals(someDate2, updatedCompetition.getStartDate());
 
-		// TODO Test logs
+		List<CompetitionLogEvent> log = sut.getLog(editedCompetition.getId());
+		assertEquals(2, log.size());
+		assertEquals(LogEventType.EDITION, log.get(0).getType());
+		assertEquals(editedCompetition, log.get(0).getCompetition());
+		assertEquals(admin, log.get(0).getAppUser());
+		assertEquals(4, log.get(0).getChanges().size());
+		int changeCount = 0;
+		for (CompetitionLogEventChange change : log.get(0).getChanges()) {
+			if (Field.NAME_EN.equals(change.getField())) {
+				assertEquals("Russia 2018", change.getOldValue());
+				assertEquals(editedCompetition.getNameEn(), change.getNewValue());
+				changeCount++;
+			} else if (Field.NAME_FR.equals(change.getField())) {
+				assertEquals("Russie 2018", change.getOldValue());
+				assertEquals(editedCompetition.getNameFr(), change.getNewValue());
+				changeCount++;
+			} else if (Field.TYPE.equals(change.getField())) {
+				assertEquals(CompetitionType.FIFA_WORLD_CUP.toString(), change.getOldValue());
+				assertEquals(editedCompetition.getType().toString(), change.getNewValue());
+				changeCount++;
+			} else if (Field.START_DATE.equals(change.getField())) {
+				assertEquals(DateTools.toString(someDate), change.getOldValue());
+				assertEquals(DateTools.toString(someDate2), change.getNewValue());
+				changeCount++;
+			}
+		}
+		assertEquals(log.get(0).getChanges().size(), changeCount);
 
-		/*
-		 * List<ReferenceLogEvent> log = sut.getLog(editedCity.getId()); assertEquals(2, log.size()); assertEquals(LogEventType.EDITION, log.get(0).getType());
-		 * assertEquals(editedCity, log.get(0).getReference()); assertEquals(admin, log.get(0).getAppUser()); assertEquals(2, log.get(0).getChanges().size()); int
-		 * changeCount = 0; for (ReferenceLogEventChange change : log.get(0).getChanges()) { if (Field.NAME_EN.equals(change.getField())) { assertEquals("Lille",
-		 * change.getOldValue()); assertEquals(editedCity.getNameEn(), change.getNewValue()); changeCount++; } else if (Field.NAME_FR.equals(change.getField())) {
-		 * assertEquals("Lille", change.getOldValue()); assertEquals(editedCity.getNameFr(), change.getNewValue()); changeCount++; } }
-		 * assertEquals(log.get(0).getChanges().size(), changeCount);
-		 */
 	}
 
 	private Competition createValidCompetitionForCreation() {
@@ -172,7 +224,7 @@ public class CompetitionServiceTest extends CommonTest {
 		competition.setNameEn("Russia 2019");
 		competition.setNameFr("Russie 2019");
 		competition.setType(CompetitionType.FIFA_WORLD_CUP);
-		competition.setStartDate(new Date());
+		competition.setStartDate(someDate);
 
 		return competition;
 	}
