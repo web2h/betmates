@@ -31,7 +31,7 @@ import com.web2h.betmates.restapp.model.validation.group.CreationChecks;
 import com.web2h.betmates.restapp.model.validation.group.EditionChecks;
 import com.web2h.tools.StringTools;
 import com.web2h.tools.authentication.PasswordFactory;
-import com.web2h.utils.form.validator.annotation.Email;
+import com.web2h.tools.validation.Email;
 
 /**
  * Application user entity class.
