@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.web2h.betmates.restapp.model.entity.competition.Competition;
 import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
 import com.web2h.betmates.restapp.model.entity.reference.Venue;
@@ -32,6 +33,8 @@ public class AlreadyExistsException extends Exception {
 		aMap.put(Field.NAME_FR.name() + Country.class.getName(), "A country already exists with the given French name");
 		aMap.put(Field.NAME_EN.name() + Venue.class.getName(), "A venue already exists in this city with the given English name");
 		aMap.put(Field.NAME_FR.name() + Venue.class.getName(), "A venue already exists in this city with the given French name");
+		aMap.put(Field.NAME_EN.name() + Competition.class.getName(), "A competition already exists with the given English name");
+		aMap.put(Field.NAME_FR.name() + Competition.class.getName(), "A competition already exists with the given French name");
 		messages = Collections.unmodifiableMap(aMap);
 	}
 

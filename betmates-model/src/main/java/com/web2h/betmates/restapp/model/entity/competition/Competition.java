@@ -4,6 +4,8 @@ import static com.web2h.betmates.restapp.model.entity.FieldLength.COMPETITION_TY
 import static com.web2h.betmates.restapp.model.entity.FieldLength.NAME_MAX_LENGTH;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.TEXT_MIN_LENGTH;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -19,12 +21,14 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.web2h.betmates.restapp.model.deserializer.JsonTrimmerDeserializer;
 import com.web2h.betmates.restapp.model.validation.Field;
 import com.web2h.betmates.restapp.model.validation.group.CreationChecks;
 import com.web2h.betmates.restapp.model.validation.group.EditionChecks;
 import com.web2h.tools.StringTools;
+import com.web2h.tools.validation.SameDayOrFuture;
 
 /**
  * Competition user entity class.
@@ -62,6 +66,12 @@ public class Competition {
 	@NotNull
 	private CompetitionType type;
 
+	/** START_DATE - Date and time of the beginning of the event. */
+	@Column(name = "start_date", nullable = false)
+	@NotNull
+	@SameDayOrFuture
+	private Date startDate;
+
 	@Override
 	public int hashCode() {
 		HashCodeBuilder hcb = new HashCodeBuilder();
@@ -87,6 +97,16 @@ public class Competition {
 		return eb.isEquals();
 	}
 
+	@JsonIgnore
+	public boolean isBeingCreated() {
+		return id == null;
+	}
+
+	@JsonIgnore
+	public boolean isBeingEdited() {
+		return id != null;
+	}
+
 	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer("COMPETITION");
@@ -94,6 +114,7 @@ public class Competition {
 		buffer.append(StringTools.getFieldAndValueToString(Field.NAME_EN, nameEn));
 		buffer.append(StringTools.getFieldAndValueToString(Field.NAME_FR, nameFr));
 		buffer.append(StringTools.getFieldAndValueToString(Field.TYPE, type));
+		buffer.append(StringTools.getFieldAndValueToString(Field.START_DATE, startDate));
 		return buffer.toString();
 	}
 
@@ -127,5 +148,13 @@ public class Competition {
 
 	public void setType(CompetitionType type) {
 		this.type = type;
+	}
+
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
 	}
 }

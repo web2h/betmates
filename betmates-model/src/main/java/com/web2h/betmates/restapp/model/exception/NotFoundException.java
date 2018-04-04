@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.web2h.betmates.restapp.model.entity.competition.Competition;
 import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
 import com.web2h.betmates.restapp.model.entity.reference.Venue;
@@ -28,6 +29,7 @@ public class NotFoundException extends Exception {
 		Map<String, String> aMap = new HashMap<>();
 		aMap.put(Field.ID.name() + City.class.getName(), "No city could be found with the given ID");
 		aMap.put(Field.ID.name() + Country.class.getName(), "No country could be found with the given ID");
+		aMap.put(Field.ID.name() + Competition.class.getName(), "No competition could be found with the given ID");
 		aMap.put(Field.ID.name() + Venue.class.getName(), "No venue could be found with the given ID");
 		messages = Collections.unmodifiableMap(aMap);
 	}

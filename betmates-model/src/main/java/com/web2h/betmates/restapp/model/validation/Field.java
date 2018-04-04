@@ -18,6 +18,7 @@ public enum Field {
 	NAME_FR("nameFr"),
 	PASSWORD("password"),
 	ROLE("role"),
+	START_DATE("startDate"),
 	TYPE("type");
 
 	private Field(String lowerCaseValue) {

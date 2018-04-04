@@ -18,21 +18,17 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import com.web2h.betmates.restapp.core.service.reference.CityService;
-import com.web2h.betmates.restapp.core.service.user.UserService;
 import com.web2h.betmates.restapp.model.entity.FieldLength;
 import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
@@ -53,17 +49,8 @@ import com.web2h.tools.StringTools;
 @WithMockUser
 public class CityControllerTest extends CommonControllerTest {
 
-	@Autowired
-	private MockMvc mockMvc;
-
 	@MockBean
 	private CityService cityService;
-
-	@MockBean
-	private UserService userService;
-
-	@MockBean
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@SpyBean
 	private CityController cityController;
@@ -157,96 +144,56 @@ public class CityControllerTest extends CommonControllerTest {
 	public void create_WithProvidedId_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForCreation();
 		city.setId(1l);
-
-		ResultActions actions = mockMvc.perform(post(CITY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
-		actions.andExpect(status().isBadRequest());
-		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.ID.toString())));
-		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.NOT_EMPTY.getJsonValue())));
+		testPostUrlAndExpectBadRequest(city, CITY_CREATION_URL, Field.ID, ErrorCode.NOT_EMPTY);
 	}
 
 	@Test
 	public void create_WithMissingEnglishName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForCreation();
 		city.setNameEn(null);
-
-		ResultActions actions = mockMvc.perform(post(CITY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
-		actions.andExpect(status().isBadRequest());
-		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_EN.toString())));
-		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.EMPTY.getJsonValue())));
+		testPostUrlAndExpectBadRequest(city, CITY_CREATION_URL, Field.NAME_EN, ErrorCode.EMPTY);
 	}
 
 	@Test
 	public void create_WithTooLongEnglishName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForCreation();
 		city.setNameEn(StringTools.random(NAME_MAX_LENGTH + 1));
-
-		ResultActions actions = mockMvc.perform(post(CITY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
-		actions.andExpect(status().isBadRequest());
-		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_EN.toString())));
-		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_LONG.getJsonValue())));
+		testPostUrlAndExpectBadRequest(city, CITY_CREATION_URL, Field.NAME_EN, ErrorCode.TOO_LONG);
 	}
 
 	@Test
 	public void create_WithTooShortEnglishName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForCreation();
 		city.setNameEn(StringTools.random(TEXT_MIN_LENGTH - 1));
-
-		ResultActions actions = mockMvc.perform(post(CITY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
-		actions.andExpect(status().isBadRequest());
-		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_EN.toString())));
-		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_SHORT.getJsonValue())));
+		testPostUrlAndExpectBadRequest(city, CITY_CREATION_URL, Field.NAME_EN, ErrorCode.TOO_SHORT);
 	}
 
 	@Test
 	public void create_WithMissingFrenchName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForCreation();
 		city.setNameFr(null);
-
-		ResultActions actions = mockMvc.perform(post(CITY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
-		actions.andExpect(status().isBadRequest());
-		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_FR.toString())));
-		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.EMPTY.getJsonValue())));
+		testPostUrlAndExpectBadRequest(city, CITY_CREATION_URL, Field.NAME_FR, ErrorCode.EMPTY);
 	}
 
 	@Test
 	public void create_WithTooLongFrenchName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForCreation();
 		city.setNameFr(StringTools.random(NAME_MAX_LENGTH + 1));
-
-		ResultActions actions = mockMvc.perform(post(CITY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
-		actions.andExpect(status().isBadRequest());
-		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_FR.toString())));
-		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_LONG.getJsonValue())));
+		testPostUrlAndExpectBadRequest(city, CITY_CREATION_URL, Field.NAME_FR, ErrorCode.TOO_LONG);
 	}
 
 	@Test
 	public void create_WithTooShortFrenchName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForCreation();
 		city.setNameFr(StringTools.random(TEXT_MIN_LENGTH - 1));
-
-		ResultActions actions = mockMvc.perform(post(CITY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
-		actions.andExpect(status().isBadRequest());
-		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_FR.toString())));
-		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_SHORT.getJsonValue())));
+		testPostUrlAndExpectBadRequest(city, CITY_CREATION_URL, Field.NAME_FR, ErrorCode.TOO_SHORT);
 	}
 
 	@Test
 	public void create_WithMissingCountry_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForCreation();
 		city.setCountry(null);
-
-		ResultActions actions = mockMvc.perform(post(CITY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
-		actions.andExpect(status().isBadRequest());
-		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.COUNTRY.toString())));
-		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.EMPTY.getJsonValue())));
+		testPostUrlAndExpectBadRequest(city, CITY_CREATION_URL, Field.COUNTRY, ErrorCode.EMPTY);
 	}
 
 	@Test
@@ -327,84 +274,56 @@ public class CityControllerTest extends CommonControllerTest {
 	public void edit_WithMissingId_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForEdition();
 		city.setId(null);
-
-		ResultActions actions = mockMvc.perform(put(CITY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
-		actions.andExpect(status().isBadRequest());
-		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.ID.toString())));
-		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.EMPTY.getJsonValue())));
+		testPutUrlAndExpectBadRequest(city, CITY_EDITION_URL, Field.ID, ErrorCode.EMPTY);
 	}
 
 	@Test
 	public void edit_WithMissingEnglishName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForEdition();
 		city.setNameEn(null);
-
-		ResultActions actions = mockMvc.perform(put(CITY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
-		actions.andExpect(status().isBadRequest());
-		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_EN.toString())));
-		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.EMPTY.getJsonValue())));
+		testPutUrlAndExpectBadRequest(city, CITY_EDITION_URL, Field.NAME_EN, ErrorCode.EMPTY);
 	}
 
 	@Test
 	public void edit_WithTooLongEnglishName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForEdition();
 		city.setNameEn(StringTools.random(NAME_MAX_LENGTH + 1));
-
-		ResultActions actions = mockMvc.perform(put(CITY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
-		actions.andExpect(status().isBadRequest());
-		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_EN.toString())));
-		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_LONG.getJsonValue())));
+		testPutUrlAndExpectBadRequest(city, CITY_EDITION_URL, Field.NAME_EN, ErrorCode.TOO_LONG);
 	}
 
 	@Test
 	public void edit_WithTooShortEnglishName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForEdition();
 		city.setNameEn(StringTools.random(TEXT_MIN_LENGTH - 1));
-
-		ResultActions actions = mockMvc.perform(put(CITY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
-		actions.andExpect(status().isBadRequest());
-		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_EN.toString())));
-		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_SHORT.getJsonValue())));
+		testPutUrlAndExpectBadRequest(city, CITY_EDITION_URL, Field.NAME_EN, ErrorCode.TOO_SHORT);
 	}
 
 	@Test
 	public void edit_WithMissingFrenchName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForEdition();
 		city.setNameFr(null);
-
-		ResultActions actions = mockMvc.perform(put(CITY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
-		actions.andExpect(status().isBadRequest());
-		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_FR.toString())));
-		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.EMPTY.getJsonValue())));
+		testPutUrlAndExpectBadRequest(city, CITY_EDITION_URL, Field.NAME_FR, ErrorCode.EMPTY);
 	}
 
 	@Test
 	public void edit_WithTooLongFrenchName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForEdition();
 		city.setNameFr(StringTools.random(NAME_MAX_LENGTH + 1));
-
-		ResultActions actions = mockMvc.perform(put(CITY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
-		actions.andExpect(status().isBadRequest());
-		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_FR.toString())));
-		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_LONG.getJsonValue())));
+		testPutUrlAndExpectBadRequest(city, CITY_EDITION_URL, Field.NAME_FR, ErrorCode.TOO_LONG);
 	}
 
 	@Test
 	public void edit_WithTooShortFrenchName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForEdition();
 		city.setNameFr(StringTools.random(TEXT_MIN_LENGTH - 1));
+		testPutUrlAndExpectBadRequest(city, CITY_EDITION_URL, Field.NAME_FR, ErrorCode.TOO_SHORT);
+	}
 
-		ResultActions actions = mockMvc.perform(put(CITY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
-		actions.andExpect(status().isBadRequest());
-		actions.andExpect(jsonPath("$.errors", hasSize(1)));
-		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.NAME_FR.toString())));
-		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.TOO_SHORT.getJsonValue())));
+	@Test
+	public void edit_WithTooShortFrenchNamMissingCountry_ShouldReturnBadRequest() throws Exception {
+		City city = createValidCityForEdition();
+		city.setCountry(null);
+		testPutUrlAndExpectBadRequest(city, CITY_EDITION_URL, Field.COUNTRY, ErrorCode.EMPTY);
 	}
 
 	private City createValidCityForCreation() {
