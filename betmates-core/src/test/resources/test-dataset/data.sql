@@ -28,3 +28,6 @@ INSERT INTO reference_log_events (`id`, `app_user_id`, `event_ts`, `event_type`,
 INSERT INTO reference_log_event_changes (`id`, `log_event_id`, `field`, `new_value`) VALUES (9, 4, 'NAME_EN', 'Parc des Princes');
 INSERT INTO reference_log_event_changes (`id`, `log_event_id`, `field`, `new_value`) VALUES (10, 4, 'NAME_FR', 'Parc des Princes');
 INSERT INTO reference_log_event_changes (`id`, `log_event_id`, `field`, `new_value`) VALUES (11, 4, 'CITY', 'Paris / Paris');
+
+INSERT INTO competitions (`id`, `name_en`, `name_fr`, `competition_type`, `start_date`) VALUES (1, 'Russia 2018', 'Russie 2018', 'FIFA_WORLD_CUP', '2018-06-10 20:00:00');
+INSERT INTO competitions (`id`, `name_en`, `name_fr`, `competition_type`, `start_date`) VALUES (2, 'NBA Playoffs 2018', 'NBA Playoffs 2018', 'NBA_PLAYOFFS', '2018-04-15 20:00:00');

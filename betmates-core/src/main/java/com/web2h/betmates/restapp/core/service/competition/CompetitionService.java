@@ -39,4 +39,13 @@ public interface CompetitionService {
 	 *             When the new values are already used by another competition
 	 */
 	Competition edit(Competition competition, AppUser editor) throws NotFoundException, AlreadyExistsException;
+
+	/**
+	 * Gets a competition.
+	 * 
+	 * @param competitionId
+	 *            Id of the competition to get.
+	 * @return The retrieved competition, null if none could be found
+	 */
+	Competition get(Long competitionId);
 }

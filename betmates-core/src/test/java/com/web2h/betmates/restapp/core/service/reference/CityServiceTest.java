@@ -8,7 +8,6 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
 import com.web2h.betmates.restapp.model.validation.Field;
-import com.web2h.betmates.restapp.persistence.repository.user.AppUserRepository;
 
 /**
  * City service test class.
@@ -41,16 +39,6 @@ public class CityServiceTest extends CommonTest {
 	@Autowired
 	private CityService sut;
 
-	@Autowired
-	private AppUserRepository appUserRepository;
-
-	private AppUser admin;
-
-	@Before
-	public void setUp() {
-		admin = appUserRepository.findOne(1l);
-	}
-
 	@Test(expected = NullPointerException.class)
 	public void create_WithNullCity_ThrowNullPointerException() throws AlreadyExistsException, InvalidDataException {
 		sut.create(null, new AppUser());
@@ -63,7 +51,7 @@ public class CityServiceTest extends CommonTest {
 
 	@Test
 	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
-	public void create_WithExistingCity_ThrowAlreadyExistsException() throws AlreadyExistsException {
+	public void create_WithExistingEnglishName_ThrowAlreadyExistsException() throws AlreadyExistsException {
 		City city = new City();
 		city.setNameEn("Paris");
 		city.setNameFr("Paris2");
@@ -76,8 +64,12 @@ public class CityServiceTest extends CommonTest {
 			assertTrue(e instanceof AlreadyExistsException);
 			assertEquals(AlreadyExistsException.messages.get(Field.NAME_EN.name() + City.class.getName()), e.getMessage());
 		}
+	}
 
-		city = new City();
+	@Test
+	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
+	public void create_WithExistingFrenchName_ThrowAlreadyExistsException() throws AlreadyExistsException {
+		City city = new City();
 		city.setNameEn("Paris2");
 		city.setNameFr("Paris");
 		city.setCountry(france);

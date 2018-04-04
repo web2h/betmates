@@ -59,6 +59,11 @@ public class CompetitionServiceImpl implements CompetitionService {
 		return competition;
 	}
 
+	@Override
+	public Competition get(Long competitionId) {
+		return competitionRepository.findOne(competitionId);
+	}
+
 	/**
 	 * Checks if the competition already exists to prevent inserting duplicates.
 	 * 
