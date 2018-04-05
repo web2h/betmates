@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import com.web2h.betmates.restapp.model.entity.competition.Competition;
 import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
+import com.web2h.betmates.restapp.model.entity.reference.Team;
 import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.http.ErrorResponse;
 import com.web2h.betmates.restapp.model.validation.ErrorCode;
@@ -30,6 +31,7 @@ public class NotFoundException extends Exception {
 		aMap.put(Field.ID.name() + City.class.getName(), "No city could be found with the given ID");
 		aMap.put(Field.ID.name() + Country.class.getName(), "No country could be found with the given ID");
 		aMap.put(Field.ID.name() + Competition.class.getName(), "No competition could be found with the given ID");
+		aMap.put(Field.ID.name() + Team.class.getName(), "No team could be found with the given ID");
 		aMap.put(Field.ID.name() + Venue.class.getName(), "No venue could be found with the given ID");
 		messages = Collections.unmodifiableMap(aMap);
 	}

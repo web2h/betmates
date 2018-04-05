@@ -6,6 +6,7 @@ public interface UrlConstants {
 	String CITY_PREFIX = "/city";
 	String COMPETITION_PREFIX = "/competition";
 	String COUNTRY_PREFIX = "/country";
+	String TEAM_PREFIX = "/team";
 	String USER_PREFIX = "/user";
 	String VENUE_PREFIX = "/venue";
 
@@ -20,6 +21,8 @@ public interface UrlConstants {
 	String COUNTRY_EDITION_URL = ADMIN_PREFIX + COUNTRY_PREFIX;
 	String LOGIN_URL = LOGIN_ACTION;
 	String SIGN_UP_URL = USER_PREFIX + SIGN_UP_ACTION;
+	String TEAM_CREATION_URL = ADMIN_PREFIX + TEAM_PREFIX;
+	String TEAM_EDITION_URL = ADMIN_PREFIX + TEAM_PREFIX;
 	String VENUE_CREATION_URL = ADMIN_PREFIX + VENUE_PREFIX;
 	String VENUE_EDITION_URL = ADMIN_PREFIX + VENUE_PREFIX;
 }
