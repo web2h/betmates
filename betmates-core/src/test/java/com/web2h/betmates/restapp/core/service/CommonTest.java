@@ -9,6 +9,8 @@ import com.web2h.betmates.restapp.model.entity.competition.Competition;
 import com.web2h.betmates.restapp.model.entity.competition.CompetitionType;
 import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
+import com.web2h.betmates.restapp.model.entity.reference.Sport;
+import com.web2h.betmates.restapp.model.entity.reference.Team;
 import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.persistence.repository.user.AppUserRepository;
@@ -30,6 +32,9 @@ public class CommonTest {
 	protected Country france;
 	protected Country belgium;
 
+	protected Team bostonCeltics;
+	protected Team miamiHeat;
+
 	protected Venue parcDesPrinces;
 	protected Venue stadeCharlety;
 	protected Venue stadeDuRoiBaudouin;
@@ -43,6 +48,7 @@ public class CommonTest {
 		createVenues();
 
 		createCompetitions();
+		createTeams();
 	}
 
 	private void createCities() {
@@ -99,6 +105,24 @@ public class CommonTest {
 		belgium.setId(6l);
 		belgium.setNameEn("Belgium");
 		belgium.setNameFr("Belgique");
+	}
+
+	private void createTeams() {
+		bostonCeltics = new Team();
+		bostonCeltics.setId(10l);
+		bostonCeltics.setNameEn("Boston Celtics");
+		bostonCeltics.setNameFr("Boston Celtics");
+		bostonCeltics.setSport(Sport.BASKET_BALL);
+		bostonCeltics.setShortNameEn("Celtics");
+		bostonCeltics.setShortNameFr("Celtics");
+
+		miamiHeat = new Team();
+		miamiHeat.setId(9l);
+		miamiHeat.setNameEn("Miami Heat");
+		miamiHeat.setNameFr("Miami Heat");
+		miamiHeat.setSport(Sport.BASKET_BALL);
+		miamiHeat.setShortNameEn("Heat");
+		miamiHeat.setShortNameFr("Heat");
 	}
 
 	private void createVenues() {

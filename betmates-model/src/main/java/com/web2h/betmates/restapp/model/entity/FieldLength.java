@@ -19,6 +19,10 @@ public interface FieldLength {
 
 	int ROLE_MAX_LENGTH = 32;
 
+	int SHORT_NAME_MAX_LENGTH = 16;
+
+	int SPORT_MAX_LENGTH = 16;
+
 	int STATUS_MAX_LENGTH = 16;
 
 	int TEXT_MIN_LENGTH = 2;

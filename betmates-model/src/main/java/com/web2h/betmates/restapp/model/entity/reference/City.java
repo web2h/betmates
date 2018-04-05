@@ -19,7 +19,7 @@ import com.web2h.tools.StringTools;
  * @author web2h
  */
 @Entity
-@Table(name = "references")
+@Table(name = "basic_references")
 @DiscriminatorValue("CITY")
 public class City extends Reference {
 

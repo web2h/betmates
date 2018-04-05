@@ -19,6 +19,9 @@ CREATE TABLE `basic_references` (
 	`discriminator` VARCHAR(16) NOT NULL,
 	`country_id` INT DEFAULT NULL,
 	`city_id` INT DEFAULT NULL,
+	`sport` VARCHAR(16) DEFAULT NULL,
+	`short_name_en` VARCHAR(16) DEFAULT NULL,
+	`short_name_fr` VARCHAR(16) DEFAULT NULL,
 	PRIMARY KEY (`id`),
 	CONSTRAINT `fk_basic_references_country_id` FOREIGN KEY (`country_id`) REFERENCES `basic_references` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
 	CONSTRAINT `fk_basic_references_city_id` FOREIGN KEY (`city_id`) REFERENCES `basic_references` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION

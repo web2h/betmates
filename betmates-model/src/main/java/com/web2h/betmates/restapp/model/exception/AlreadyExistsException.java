@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import com.web2h.betmates.restapp.model.entity.competition.Competition;
 import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
+import com.web2h.betmates.restapp.model.entity.reference.Team;
 import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.http.ErrorResponse;
 import com.web2h.betmates.restapp.model.validation.ErrorCode;
@@ -29,12 +30,15 @@ public class AlreadyExistsException extends Exception {
 		aMap.put(Field.EMAIL.name(), "A user already exists with the given email");
 		aMap.put(Field.NAME_EN.name() + City.class.getName(), "A city already exists in this country with the given English name");
 		aMap.put(Field.NAME_FR.name() + City.class.getName(), "A city already exists in this country with the given French name");
-		aMap.put(Field.NAME_EN.name() + Country.class.getName(), "A country already exists with the given English name");
-		aMap.put(Field.NAME_FR.name() + Country.class.getName(), "A country already exists with the given French name");
-		aMap.put(Field.NAME_EN.name() + Venue.class.getName(), "A venue already exists in this city with the given English name");
-		aMap.put(Field.NAME_FR.name() + Venue.class.getName(), "A venue already exists in this city with the given French name");
 		aMap.put(Field.NAME_EN.name() + Competition.class.getName(), "A competition already exists with the given English name");
 		aMap.put(Field.NAME_FR.name() + Competition.class.getName(), "A competition already exists with the given French name");
+		aMap.put(Field.NAME_EN.name() + Country.class.getName(), "A country already exists with the given English name");
+		aMap.put(Field.NAME_FR.name() + Country.class.getName(), "A country already exists with the given French name");
+		aMap.put(Field.NAME_EN.name() + Team.class.getName(), "A team already exists for this sport with the given English name");
+		aMap.put(Field.NAME_FR.name() + Team.class.getName(), "A team already exists for this sport with the given French name");
+		aMap.put(Field.NAME_EN.name() + Venue.class.getName(), "A venue already exists in this city with the given English name");
+		aMap.put(Field.NAME_FR.name() + Venue.class.getName(), "A venue already exists in this city with the given French name");
+
 		messages = Collections.unmodifiableMap(aMap);
 	}
 

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.web2h.betmates.restapp.model.entity.log.LogEventType;
 import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Reference;
+import com.web2h.betmates.restapp.model.entity.reference.Team;
 import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEvent;
 import com.web2h.betmates.restapp.model.entity.reference.log.ReferenceLogEventChange;
@@ -44,6 +45,12 @@ public class ReferenceLogServiceImpl implements ReferenceLogService {
 			event.getChanges().add(new ReferenceLogEventChange(event, Field.COUNTRY, ((City) reference).getCountry().getLogValue()));
 		}
 
+		if (reference instanceof Team) {
+			event.getChanges().add(new ReferenceLogEventChange(event, Field.SPORT, ((Team) reference).getSport().toString()));
+			event.getChanges().add(new ReferenceLogEventChange(event, Field.SHORT_NAME_EN, ((Team) reference).getShortNameEn()));
+			event.getChanges().add(new ReferenceLogEventChange(event, Field.SHORT_NAME_FR, ((Team) reference).getShortNameFr()));
+		}
+
 		if (reference instanceof Venue) {
 			event.getChanges().add(new ReferenceLogEventChange(event, Field.CITY, ((Venue) reference).getCity().getLogValue()));
 		}
@@ -64,6 +71,18 @@ public class ReferenceLogServiceImpl implements ReferenceLogService {
 
 		if (oldReference instanceof City && !((City) oldReference).getCountry().equals(((City) newReference).getCountry())) {
 			event.getChanges().add(new ReferenceLogEventChange(event, Field.COUNTRY, ((City) newReference).getCountry().getLogValue(), ((City) oldReference).getCountry().getLogValue()));
+		}
+
+		if (oldReference instanceof Team) {
+			if (!((Team) oldReference).getSport().equals(((Team) newReference).getSport())) {
+				event.getChanges().add(new ReferenceLogEventChange(event, Field.SPORT, ((Team) newReference).getSport().toString(), ((Team) oldReference).getSport().toString()));
+			}
+			if (!((Team) oldReference).getShortNameEn().equals(((Team) newReference).getShortNameEn())) {
+				event.getChanges().add(new ReferenceLogEventChange(event, Field.SHORT_NAME_EN, ((Team) newReference).getShortNameEn(), ((Team) oldReference).getShortNameEn()));
+			}
+			if (!((Team) oldReference).getShortNameFr().equals(((Team) newReference).getShortNameFr())) {
+				event.getChanges().add(new ReferenceLogEventChange(event, Field.SHORT_NAME_FR, ((Team) newReference).getShortNameFr(), ((Team) oldReference).getShortNameFr()));
+			}
 		}
 
 		if (oldReference instanceof Venue && !((Venue) oldReference).getCity().equals(((Venue) newReference).getCity())) {

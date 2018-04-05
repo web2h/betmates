@@ -18,6 +18,9 @@ public enum Field {
 	NAME_FR("nameFr"),
 	PASSWORD("password"),
 	ROLE("role"),
+	SHORT_NAME_EN("shortNameEn"),
+	SHORT_NAME_FR("shortNameFr"),
+	SPORT("sport"),
 	START_DATE("startDate"),
 	TYPE("type");
 

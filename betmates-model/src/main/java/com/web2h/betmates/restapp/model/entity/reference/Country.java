@@ -10,7 +10,7 @@ import javax.persistence.Table;
  * @author web2h
  */
 @Entity
-@Table(name = "references")
+@Table(name = "basic_references")
 @DiscriminatorValue("COUNTRY")
 public class Country extends Reference {
 
