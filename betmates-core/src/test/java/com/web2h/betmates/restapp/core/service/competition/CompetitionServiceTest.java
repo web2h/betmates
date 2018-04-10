@@ -28,6 +28,7 @@ import com.web2h.betmates.restapp.model.entity.log.LogEventType;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
+import com.web2h.betmates.restapp.model.exception.NotFoundException;
 import com.web2h.betmates.restapp.model.validation.Field;
 import com.web2h.tools.DateTools;
 
@@ -56,6 +57,43 @@ public class CompetitionServiceTest extends CommonTest {
 
 		calendar.set(2020, Calendar.JUNE, 10, 20, 00, 00);
 		someDate2 = calendar.getTime();
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void addOrRemoveTeams_WithNullCompetition_ThrowNullPointerException() throws NotFoundException {
+		sut.addOrRemoveTeams(null, new AppUser());
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void addOrRemoveTeams_WithNullEditor_ThrowNullPointerException() throws NotFoundException {
+		sut.addOrRemoveTeams(new Competition(), null);
+	}
+
+	@Test
+	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
+	public void addOrRemoveTeams_WithUnknownCompetition_ThrowNotFoundException() throws NotFoundException {
+		nbaPlayoffs2018.setId(10000l);
+
+		try {
+			sut.addOrRemoveTeams(nbaPlayoffs2018, admin);
+			fail("Team change should never succeed");
+		} catch (Exception e) {
+			assertTrue(e instanceof NotFoundException);
+			assertEquals(NotFoundException.messages.get(Field.ID.name() + Competition.class.getName()), e.getMessage());
+		}
+	}
+
+	@Test
+	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
+	public void addOrRemoveTeams_AddTeams_TeamsAreAdded() throws NotFoundException {
+
+		nbaPlayoffs2018.getTeams().add(chicagoBulls);
+		nbaPlayoffs2018.getTeams().add(orlandoMagic);
+
+		sut.addOrRemoveTeams(nbaPlayoffs2018, admin);
+
+		Competition editedCompetition = sut.get(nbaPlayoffs2018.getId());
+		assertEquals(4, editedCompetition.getTeams().size());
 	}
 
 	@Test(expected = NullPointerException.class)

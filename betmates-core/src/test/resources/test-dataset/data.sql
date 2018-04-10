@@ -12,6 +12,8 @@ INSERT INTO basic_references (`id`, `name_en`, `name_fr`, `discriminator`, `city
 
 INSERT INTO basic_references (`id`, `name_en`, `name_fr`, `discriminator`, `sport`, `short_name_en`, `short_name_fr`) VALUES (9, 'Miami Heat', 'Miami Heat', 'TEAM', 'BASKET_BALL', 'Heat', 'Heat');
 INSERT INTO basic_references (`id`, `name_en`, `name_fr`, `discriminator`, `sport`, `short_name_en`, `short_name_fr`) VALUES (10, 'Boston Celtics', 'Boston Celtics', 'TEAM', 'BASKET_BALL', 'Celtics', 'Celtics');
+INSERT INTO basic_references (`id`, `name_en`, `name_fr`, `discriminator`, `sport`, `short_name_en`, `short_name_fr`) VALUES (11, 'Orlando Magic', 'Orlando Magic', 'TEAM', 'BASKET_BALL', 'Magic', 'Magic');
+INSERT INTO basic_references (`id`, `name_en`, `name_fr`, `discriminator`, `sport`, `short_name_en`, `short_name_fr`) VALUES (12, 'Chicago Bulls', 'Chicago Bulls', 'TEAM', 'BASKET_BALL', 'Bulls', 'Bulls');
 
 INSERT INTO reference_log_events (`id`, `app_user_id`, `event_ts`, `event_type`, `reference_id`) VALUES (1, 1, '2018-04-01 18:00:00', 'CREATION', 1);
 INSERT INTO reference_log_event_changes (`id`, `log_event_id`, `field`, `new_value`) VALUES (1, 1, 'NAME_EN', 'France');
@@ -32,13 +34,18 @@ INSERT INTO reference_log_event_changes (`id`, `log_event_id`, `field`, `new_val
 INSERT INTO reference_log_event_changes (`id`, `log_event_id`, `field`, `new_value`) VALUES (10, 4, 'NAME_FR', 'Parc des Princes');
 INSERT INTO reference_log_event_changes (`id`, `log_event_id`, `field`, `new_value`) VALUES (11, 4, 'CITY', 'Paris / Paris');
 
-INSERT INTO reference_log_events (`id`, `app_user_id`, `event_ts`, `event_type`, `reference_id`) VALUES (5, 1, '2018-04-01 18:00:04', 'CREATION', 9);
-
-INSERT INTO reference_log_events (`id`, `app_user_id`, `event_ts`, `event_type`, `reference_id`) VALUES (6, 1, '2018-04-01 18:00:05', 'CREATION', 10);
+INSERT INTO reference_log_events (`id`, `app_user_id`, `event_ts`, `event_type`, `reference_id`) VALUES (9, 1, '2018-04-01 18:00:04', 'CREATION', 9);
+INSERT INTO reference_log_events (`id`, `app_user_id`, `event_ts`, `event_type`, `reference_id`) VALUES (10, 1, '2018-04-01 18:00:05', 'CREATION', 10);
+INSERT INTO reference_log_events (`id`, `app_user_id`, `event_ts`, `event_type`, `reference_id`) VALUES (11, 1, '2018-04-01 18:00:06', 'CREATION', 11);
+INSERT INTO reference_log_events (`id`, `app_user_id`, `event_ts`, `event_type`, `reference_id`) VALUES (12, 1, '2018-04-01 18:00:07', 'CREATION', 12);
 
 INSERT INTO competitions (`id`, `name_en`, `name_fr`, `competition_type`, `start_date`) VALUES (1, 'Russia 2018', 'Russie 2018', 'FIFA_WORLD_CUP', '2018-06-10 20:00:00');
 INSERT INTO competitions (`id`, `name_en`, `name_fr`, `competition_type`, `start_date`) VALUES (2, 'NBA Playoffs 2018', 'NBA Playoffs 2018', 'NBA_PLAYOFFS', '2018-04-15 20:00:00');
 
-INSERT INTO competition_log_events (`id`, `app_user_id`, `event_ts`, `event_type`, `competition_id`) VALUES (1, 1, '2018-04-02 18:00:02', 'CREATION', 1);
+INSERT INTO `competition_teams` (`id`, `competition_id`, `team_id`) VALUES (1, 2, 9);
+INSERT INTO `competition_teams` (`id`, `competition_id`, `team_id`) VALUES (1, 2, 10);
 
+INSERT INTO competition_log_events (`id`, `app_user_id`, `event_ts`, `event_type`, `competition_id`) VALUES (1, 1, '2018-04-02 18:00:02', 'CREATION', 1);
 INSERT INTO competition_log_events (`id`, `app_user_id`, `event_ts`, `event_type`, `competition_id`) VALUES (2, 1, '2018-04-02 18:00:03', 'CREATION', 2);
+INSERT INTO competition_log_events (`id`, `app_user_id`, `event_ts`, `event_type`, `competition_id`, `Team addition`) VALUES (3, 1, '2018-04-02 18:00:04', 'TEAM_ADDITION', 2);
+INSERT INTO competition_log_events (`id`, `app_user_id`, `event_ts`, `event_type`, `competition_id`, `Team addition`) VALUES (4, 1, '2018-04-02 18:00:04', 'TEAM_ADDITION', 2);

@@ -34,6 +34,8 @@ public class CommonTest {
 
 	protected Team bostonCeltics;
 	protected Team miamiHeat;
+	protected Team orlandoMagic;
+	protected Team chicagoBulls;
 
 	protected Venue parcDesPrinces;
 	protected Venue stadeCharlety;
@@ -49,6 +51,12 @@ public class CommonTest {
 
 		createCompetitions();
 		createTeams();
+		addTeamsToCompetitions();
+	}
+
+	private void addTeamsToCompetitions() {
+		nbaPlayoffs2018.getTeams().add(bostonCeltics);
+		nbaPlayoffs2018.getTeams().add(miamiHeat);
 	}
 
 	private void createCities() {
@@ -123,6 +131,22 @@ public class CommonTest {
 		miamiHeat.setSport(Sport.BASKET_BALL);
 		miamiHeat.setShortNameEn("Heat");
 		miamiHeat.setShortNameFr("Heat");
+
+		orlandoMagic = new Team();
+		orlandoMagic.setId(10l);
+		orlandoMagic.setNameEn("Orlando Magic");
+		orlandoMagic.setNameFr("Orlando Magic");
+		orlandoMagic.setSport(Sport.BASKET_BALL);
+		orlandoMagic.setShortNameEn("Magic");
+		orlandoMagic.setShortNameFr("Magic");
+
+		chicagoBulls = new Team();
+		chicagoBulls.setId(11l);
+		chicagoBulls.setNameEn("Chicago Bulls");
+		chicagoBulls.setNameFr("Chicago Bulls");
+		chicagoBulls.setSport(Sport.BASKET_BALL);
+		chicagoBulls.setShortNameEn("Bulls");
+		chicagoBulls.setShortNameFr("Bulls");
 	}
 
 	private void createVenues() {

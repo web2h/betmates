@@ -74,7 +74,7 @@ public abstract class Reference {
 
 	@JsonIgnore
 	public String getLogValue() {
-		return nameEn + " / " + nameFr;
+		return "(" + id + ")" + nameEn;
 	}
 
 	@Override

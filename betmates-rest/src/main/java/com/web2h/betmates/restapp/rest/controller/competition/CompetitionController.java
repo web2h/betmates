@@ -1,5 +1,6 @@
 package com.web2h.betmates.restapp.rest.controller.competition;
 
+import static com.web2h.betmates.restapp.rest.controller.UrlConstants.ADD_OR_REMOVE_TEAM_ACTION;
 import static com.web2h.betmates.restapp.rest.controller.UrlConstants.ADMIN_PREFIX;
 import static com.web2h.betmates.restapp.rest.controller.UrlConstants.COMPETITION_PREFIX;
 
@@ -44,6 +45,29 @@ public class CompetitionController extends CommonController {
 	public CompetitionController(CompetitionService competitionService, UserService userService) {
 		super(userService);
 		this.competitionService = competitionService;
+	}
+
+	@PostMapping(ADD_OR_REMOVE_TEAM_ACTION)
+	public ResponseEntity<Object> addOrRemoveTeams(@RequestBody @Validated(EditionChecks.class) Competition competition, BindingResult result) {
+		logger.info("Team addition or removal for " + competition);
+		if (result.hasErrors()) {
+			InvalidDataException ide = new InvalidDataException(result.getAllErrors());
+			logger.warn("Invalid data");
+			return ide.getResponseEntity();
+		}
+
+		Competition updatedCompetition = null;
+		try {
+			updatedCompetition = competitionService.addOrRemoveTeams(competition, getLoggedInUser());
+		} catch (NotFoundException nfe) {
+			logger.warn(nfe.getMessage());
+			return nfe.getResponseEntity();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return new InternalErrorException(e.getMessage()).getResponseEntity();
+		}
+
+		return new ResponseEntity<Object>(updatedCompetition, HttpStatus.OK);
 	}
 
 	@PostMapping

@@ -42,7 +42,7 @@ public abstract class LogEvent {
 	@Column(name = "event_type", length = 32)
 	private LogEventType type;
 
-	/** DESCRIPTION - Complementary description. */
+	/** DESCRIPTION - Event description. */
 	@Column(name = "description", length = 512, nullable = true)
 	private String description;
 

@@ -1,14 +1,19 @@
 package com.web2h.betmates.restapp.core.service.competition;
 
+import java.util.Iterator;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Preconditions;
+import com.web2h.betmates.restapp.core.service.competition.helper.AddedAndRemovedTeams;
 import com.web2h.betmates.restapp.model.entity.competition.Competition;
 import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEvent;
+import com.web2h.betmates.restapp.model.entity.reference.Team;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.NotFoundException;
@@ -24,6 +29,8 @@ import com.web2h.betmates.restapp.persistence.repository.competition.Competition
 @Transactional
 public class CompetitionServiceImpl implements CompetitionService {
 
+	private Logger logger = LoggerFactory.getLogger(CompetitionServiceImpl.class);
+
 	private CompetitionRepository competitionRepository;
 
 	private CompetitionLogService competitionLogService;
@@ -31,6 +38,23 @@ public class CompetitionServiceImpl implements CompetitionService {
 	public CompetitionServiceImpl(CompetitionRepository competitionRepository, CompetitionLogService competitionLogService) {
 		this.competitionRepository = competitionRepository;
 		this.competitionLogService = competitionLogService;
+	}
+
+	@Override
+	public Competition addOrRemoveTeams(Competition competition, AppUser editor) throws NotFoundException {
+		Preconditions.checkNotNull(competition);
+		Preconditions.checkNotNull(editor);
+
+		Competition currentCompetition = competitionRepository.findOne(competition.getId());
+		if (currentCompetition == null) {
+			throw new NotFoundException(Field.ID, Competition.class.getName());
+		}
+
+		AddedAndRemovedTeams addedAndRemovedTeams = mergeTeams(currentCompetition, competition);
+		competitionLogService.LogTeamAdditionOrRemoval(currentCompetition, addedAndRemovedTeams, editor);
+
+		competitionRepository.save(currentCompetition);
+		return currentCompetition;
 	}
 
 	@Override
@@ -51,16 +75,16 @@ public class CompetitionServiceImpl implements CompetitionService {
 		Preconditions.checkNotNull(competition);
 		Preconditions.checkNotNull(editor);
 
-		Competition existingCompetition = competitionRepository.findOne(competition.getId());
-		if (existingCompetition == null) {
+		Competition currentCompetition = competitionRepository.findOne(competition.getId());
+		if (currentCompetition == null) {
 			throw new NotFoundException(Field.ID, Competition.class.getName());
 		}
 
 		checkIfExists(competition);
 
-		competitionLogService.logEdition(existingCompetition, competition, editor);
+		competitionLogService.logEdition(currentCompetition, competition, editor);
 
-		merge(existingCompetition, competition);
+		merge(currentCompetition, competition);
 		competitionRepository.save(competition);
 		return competition;
 	}
@@ -97,15 +121,41 @@ public class CompetitionServiceImpl implements CompetitionService {
 	/**
 	 * Merges competitions.
 	 * 
-	 * @param existingCompetition
+	 * @param currentCompetition
 	 *            The existing competition in DB before the edition
 	 * @param newCompetition
 	 *            The new competition values
 	 */
-	public void merge(Competition existingCompetition, Competition newCompetition) {
-		existingCompetition.setNameEn(newCompetition.getNameEn());
-		existingCompetition.setNameFr(newCompetition.getNameFr());
-		existingCompetition.setType(newCompetition.getType());
-		existingCompetition.setStartDate(newCompetition.getStartDate());
+	public void merge(Competition currentCompetition, Competition newCompetition) {
+		currentCompetition.setNameEn(newCompetition.getNameEn());
+		currentCompetition.setNameFr(newCompetition.getNameFr());
+		currentCompetition.setType(newCompetition.getType());
+		currentCompetition.setStartDate(newCompetition.getStartDate());
+	}
+
+	public AddedAndRemovedTeams mergeTeams(Competition currentCompetition, Competition newCompetition) {
+		AddedAndRemovedTeams addedAndRemovedTeams = new AddedAndRemovedTeams();
+
+		// Teams removed from the competition
+		Iterator<Team> currentTeamsIterator = currentCompetition.getTeams().iterator();
+		while (currentTeamsIterator.hasNext()) {
+			Team currentTeam = currentTeamsIterator.next();
+			if (!newCompetition.getTeams().contains(currentTeam)) {
+				logger.info("The team " + currentTeam.getLogValue() + " has been removed from the competition " + currentCompetition.getLogValue());
+				currentTeamsIterator.remove();
+				addedAndRemovedTeams.getRemovedTeams().add(currentTeam);
+			}
+		}
+
+		// New teams to add
+		for (Team newTeam : newCompetition.getTeams()) {
+			if (!currentCompetition.getTeams().contains(newTeam)) {
+				logger.info("The team " + newTeam.getLogValue() + " has been added to the competition " + currentCompetition.getLogValue());
+				currentCompetition.getTeams().add(newTeam);
+				addedAndRemovedTeams.getAddedTeams().add(newTeam);
+			}
+		}
+
+		return addedAndRemovedTeams;
 	}
 }

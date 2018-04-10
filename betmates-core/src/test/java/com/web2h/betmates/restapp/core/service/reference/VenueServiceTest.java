@@ -201,7 +201,7 @@ public class VenueServiceTest extends CommonTest {
 				assertEquals(editedVenue.getNameFr(), change.getNewValue());
 				changeCount++;
 			} else if (Field.CITY.equals(change.getField())) {
-				assertEquals("Paris / Paris", change.getOldValue());
+				assertEquals("(2)Paris", change.getOldValue());
 				assertEquals(editedVenue.getCity().getLogValue(), change.getNewValue());
 				changeCount++;
 			}

@@ -15,6 +15,8 @@ import com.web2h.betmates.restapp.model.exception.NotFoundException;
  */
 public interface CompetitionService {
 
+	Competition addOrRemoveTeams(Competition competition, AppUser editor) throws NotFoundException;
+
 	/**
 	 * Creates a new competition.
 	 * 

@@ -9,4 +9,6 @@ public enum LogEventType {
 
 	CREATION,
 	EDITION,
+	TEAM_ADDITION,
+	TEAM_REMOVAL
 }

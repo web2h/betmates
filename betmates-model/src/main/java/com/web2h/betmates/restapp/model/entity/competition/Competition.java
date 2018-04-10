@@ -5,7 +5,10 @@ import static com.web2h.betmates.restapp.model.entity.FieldLength.NAME_MAX_LENGT
 import static com.web2h.betmates.restapp.model.entity.FieldLength.TEXT_MIN_LENGTH;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,6 +16,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
@@ -24,6 +30,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.web2h.betmates.restapp.model.deserializer.JsonTrimmerDeserializer;
+import com.web2h.betmates.restapp.model.entity.reference.Team;
 import com.web2h.betmates.restapp.model.validation.Field;
 import com.web2h.betmates.restapp.model.validation.group.CreationChecks;
 import com.web2h.betmates.restapp.model.validation.group.EditionChecks;
@@ -72,6 +79,11 @@ public class Competition {
 	@SameDayOrFuture
 	private Date startDate;
 
+	/** TEAMS - Teams playing in that competition. */
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name = "competition_teams", joinColumns = @JoinColumn(name = "competition_id"), inverseJoinColumns = @JoinColumn(name = "team_id"))
+	private Set<Team> teams = new HashSet<>();
+
 	@Override
 	public int hashCode() {
 		HashCodeBuilder hcb = new HashCodeBuilder();
@@ -105,6 +117,11 @@ public class Competition {
 	@JsonIgnore
 	public boolean isBeingEdited() {
 		return id != null;
+	}
+
+	@JsonIgnore
+	public String getLogValue() {
+		return "(" + id + ")" + nameEn;
 	}
 
 	@Override
@@ -156,5 +173,9 @@ public class Competition {
 
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
+	}
+
+	public Set<Team> getTeams() {
+		return teams;
 	}
 }
