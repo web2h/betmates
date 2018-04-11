@@ -181,7 +181,7 @@ public class VenueServiceTest extends CommonTest {
 		parcDesPrinces.setCity(lille);
 
 		Venue editedVenue = sut.edit(parcDesPrinces, admin);
-		assertEquals(new Long(4), editedVenue.getId());
+		assertEquals(new Long(21), editedVenue.getId());
 		assertEquals(sut.get(parcDesPrinces.getId()), parcDesPrinces);
 
 		List<ReferenceLogEvent> log = sut.getLog(editedVenue.getId());
@@ -201,7 +201,7 @@ public class VenueServiceTest extends CommonTest {
 				assertEquals(editedVenue.getNameFr(), change.getNewValue());
 				changeCount++;
 			} else if (Field.CITY.equals(change.getField())) {
-				assertEquals("(2)Paris", change.getOldValue());
+				assertEquals("(11)Paris", change.getOldValue());
 				assertEquals(editedVenue.getCity().getLogValue(), change.getNewValue());
 				changeCount++;
 			}
@@ -218,7 +218,7 @@ public class VenueServiceTest extends CommonTest {
 		parcDesPrinces.getCity().setId(lille.getId());
 
 		Venue editedVenue = sut.edit(parcDesPrinces, admin);
-		assertEquals(new Long(4), editedVenue.getId());
+		assertEquals(new Long(21), editedVenue.getId());
 		assertEquals(sut.get(parcDesPrinces.getId()), parcDesPrinces);
 		assertEquals(lille.getNameEn(), editedVenue.getCity().getNameEn());
 		assertEquals(lille.getNameFr(), editedVenue.getCity().getNameFr());

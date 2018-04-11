@@ -61,19 +61,19 @@ public class CommonTest {
 
 	private void createCities() {
 		paris = new City();
-		paris.setId(2l);
+		paris.setId(11l);
 		paris.setNameEn("Paris");
 		paris.setNameFr("Paris");
 		paris.setCountry(france);
 
 		lille = new City();
-		lille.setId(3l);
+		lille.setId(12l);
 		lille.setNameEn("Lille");
 		lille.setNameFr("Lille");
 		lille.setCountry(france);
 
 		brussels = new City();
-		brussels.setId(7l);
+		brussels.setId(13l);
 		brussels.setNameEn("Brussels");
 		brussels.setNameFr("Bruxelles");
 		brussels.setCountry(belgium);
@@ -110,30 +110,30 @@ public class CommonTest {
 		france.setNameFr("France");
 
 		belgium = new Country();
-		belgium.setId(6l);
+		belgium.setId(2l);
 		belgium.setNameEn("Belgium");
 		belgium.setNameFr("Belgique");
 	}
 
 	private void createTeams() {
-		bostonCeltics = new Team();
-		bostonCeltics.setId(10l);
-		bostonCeltics.setNameEn("Boston Celtics");
-		bostonCeltics.setNameFr("Boston Celtics");
-		bostonCeltics.setSport(Sport.BASKET_BALL);
-		bostonCeltics.setShortNameEn("Celtics");
-		bostonCeltics.setShortNameFr("Celtics");
-
 		miamiHeat = new Team();
-		miamiHeat.setId(9l);
+		miamiHeat.setId(31l);
 		miamiHeat.setNameEn("Miami Heat");
 		miamiHeat.setNameFr("Miami Heat");
 		miamiHeat.setSport(Sport.BASKET_BALL);
 		miamiHeat.setShortNameEn("Heat");
 		miamiHeat.setShortNameFr("Heat");
 
+		bostonCeltics = new Team();
+		bostonCeltics.setId(32l);
+		bostonCeltics.setNameEn("Boston Celtics");
+		bostonCeltics.setNameFr("Boston Celtics");
+		bostonCeltics.setSport(Sport.BASKET_BALL);
+		bostonCeltics.setShortNameEn("Celtics");
+		bostonCeltics.setShortNameFr("Celtics");
+
 		orlandoMagic = new Team();
-		orlandoMagic.setId(10l);
+		orlandoMagic.setId(33l);
 		orlandoMagic.setNameEn("Orlando Magic");
 		orlandoMagic.setNameFr("Orlando Magic");
 		orlandoMagic.setSport(Sport.BASKET_BALL);
@@ -141,7 +141,7 @@ public class CommonTest {
 		orlandoMagic.setShortNameFr("Magic");
 
 		chicagoBulls = new Team();
-		chicagoBulls.setId(11l);
+		chicagoBulls.setId(34l);
 		chicagoBulls.setNameEn("Chicago Bulls");
 		chicagoBulls.setNameFr("Chicago Bulls");
 		chicagoBulls.setSport(Sport.BASKET_BALL);
@@ -151,19 +151,19 @@ public class CommonTest {
 
 	private void createVenues() {
 		parcDesPrinces = new Venue();
-		parcDesPrinces.setId(4l);
+		parcDesPrinces.setId(21l);
 		parcDesPrinces.setNameEn("Parc des Princes");
 		parcDesPrinces.setNameFr("Parc des Princes");
 		parcDesPrinces.setCity(paris);
 
 		stadeCharlety = new Venue();
-		stadeCharlety.setId(5l);
+		stadeCharlety.setId(22l);
 		stadeCharlety.setNameEn("Stade Charléty");
 		stadeCharlety.setNameFr("Stade Charléty");
 		stadeCharlety.setCity(paris);
 
 		stadeDuRoiBaudouin = new Venue();
-		stadeDuRoiBaudouin.setId(8l);
+		stadeDuRoiBaudouin.setId(23l);
 		stadeDuRoiBaudouin.setNameEn("Stade du Roi Baudouin");
 		stadeDuRoiBaudouin.setNameFr("Stade du Roi Baudouin");
 		stadeDuRoiBaudouin.setCity(brussels);

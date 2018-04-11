@@ -46,7 +46,7 @@ public class ReferenceLogServiceImpl implements ReferenceLogService {
 		}
 
 		if (reference instanceof Team) {
-			event.getChanges().add(new ReferenceLogEventChange(event, Field.SPORT, ((Team) reference).getSport().toString()));
+			event.getChanges().add(new ReferenceLogEventChange(event, Field.SPORT, ((Team) reference).getSport().getLogValue()));
 			event.getChanges().add(new ReferenceLogEventChange(event, Field.SHORT_NAME_EN, ((Team) reference).getShortNameEn()));
 			event.getChanges().add(new ReferenceLogEventChange(event, Field.SHORT_NAME_FR, ((Team) reference).getShortNameFr()));
 		}
@@ -75,7 +75,7 @@ public class ReferenceLogServiceImpl implements ReferenceLogService {
 
 		if (oldReference instanceof Team) {
 			if (!((Team) oldReference).getSport().equals(((Team) newReference).getSport())) {
-				event.getChanges().add(new ReferenceLogEventChange(event, Field.SPORT, ((Team) newReference).getSport().toString(), ((Team) oldReference).getSport().toString()));
+				event.getChanges().add(new ReferenceLogEventChange(event, Field.SPORT, ((Team) newReference).getSport().getLogValue(), ((Team) oldReference).getSport().getLogValue()));
 			}
 			if (!((Team) oldReference).getShortNameEn().equals(((Team) newReference).getShortNameEn())) {
 				event.getChanges().add(new ReferenceLogEventChange(event, Field.SHORT_NAME_EN, ((Team) newReference).getShortNameEn(), ((Team) oldReference).getShortNameEn()));

@@ -119,7 +119,7 @@ public class TeamServiceTest extends CommonTest {
 				changeCount++;
 			} else if (Field.SPORT.equals(change.getField())) {
 				assertNull(change.getOldValue());
-				assertEquals(createdTeam.getSport().toString(), change.getNewValue());
+				assertEquals(createdTeam.getSport().getLogValue(), change.getNewValue());
 				changeCount++;
 			} else if (Field.SHORT_NAME_EN.equals(change.getField())) {
 				assertNull(change.getOldValue());
@@ -182,7 +182,7 @@ public class TeamServiceTest extends CommonTest {
 		miamiHeat.setShortNameFr("Heat 2");
 
 		Team editedTeam = sut.edit(miamiHeat, admin);
-		assertEquals(new Long(9), editedTeam.getId());
+		assertEquals(new Long(31), editedTeam.getId());
 		assertEquals(sut.get(miamiHeat.getId()), miamiHeat);
 
 		List<ReferenceLogEvent> log = sut.getLog(editedTeam.getId());
@@ -202,8 +202,8 @@ public class TeamServiceTest extends CommonTest {
 				assertEquals(editedTeam.getNameFr(), change.getNewValue());
 				changeCount++;
 			} else if (Field.SPORT.equals(change.getField())) {
-				assertEquals(Sport.BASKET_BALL.toString(), change.getOldValue());
-				assertEquals(editedTeam.getSport().toString(), change.getNewValue());
+				assertEquals(Sport.BASKET_BALL.getLogValue(), change.getOldValue());
+				assertEquals(editedTeam.getSport().getLogValue(), change.getNewValue());
 				changeCount++;
 			} else if (Field.SHORT_NAME_EN.equals(change.getField())) {
 				assertEquals("Heat", change.getOldValue());

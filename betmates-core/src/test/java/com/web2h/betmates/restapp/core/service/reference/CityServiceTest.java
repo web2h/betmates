@@ -181,7 +181,7 @@ public class CityServiceTest extends CommonTest {
 		lille.setNameFr("Marseille");
 
 		City editedCity = sut.edit(lille, admin);
-		assertEquals(new Long(3), editedCity.getId());
+		assertEquals(new Long(12), editedCity.getId());
 		assertEquals(sut.get(lille.getId()), lille);
 
 		List<ReferenceLogEvent> log = sut.getLog(editedCity.getId());

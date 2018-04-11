@@ -20,11 +20,13 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.web2h.betmates.restapp.core.service.CommonTest;
+import com.web2h.betmates.restapp.core.service.reference.TeamService;
 import com.web2h.betmates.restapp.model.entity.competition.Competition;
 import com.web2h.betmates.restapp.model.entity.competition.CompetitionType;
 import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEvent;
 import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEventChange;
 import com.web2h.betmates.restapp.model.entity.log.LogEventType;
+import com.web2h.betmates.restapp.model.entity.reference.Team;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
@@ -43,6 +45,9 @@ public class CompetitionServiceTest extends CommonTest {
 
 	@Autowired
 	private CompetitionService sut;
+
+	@Autowired
+	private TeamService teamService;
 
 	private Date someDate;
 
@@ -86,14 +91,121 @@ public class CompetitionServiceTest extends CommonTest {
 	@Test
 	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
 	public void addOrRemoveTeams_AddTeams_TeamsAreAdded() throws NotFoundException {
-
-		nbaPlayoffs2018.getTeams().add(chicagoBulls);
-		nbaPlayoffs2018.getTeams().add(orlandoMagic);
+		nbaPlayoffs2018.getTeams().add(teamService.get(chicagoBulls.getId()));
+		nbaPlayoffs2018.getTeams().add(teamService.get(orlandoMagic.getId()));
 
 		sut.addOrRemoveTeams(nbaPlayoffs2018, admin);
 
 		Competition editedCompetition = sut.get(nbaPlayoffs2018.getId());
 		assertEquals(4, editedCompetition.getTeams().size());
+
+		boolean miamiIsHere = false;
+		boolean chicagoIsHere = false;
+		boolean bostonIsHere = false;
+		boolean orlandoIsHere = false;
+
+		for (Team team : editedCompetition.getTeams()) {
+			if (bostonCeltics.equals(team)) {
+				bostonIsHere = true;
+			} else if (miamiHeat.equals(team)) {
+				miamiIsHere = true;
+			} else if (chicagoBulls.equals(team)) {
+				chicagoIsHere = true;
+			} else if (orlandoMagic.equals(team)) {
+				orlandoIsHere = true;
+			}
+		}
+		assertTrue(miamiIsHere);
+		assertTrue(chicagoIsHere);
+		assertTrue(bostonIsHere);
+		assertTrue(orlandoIsHere);
+
+		List<CompetitionLogEvent> log = sut.getLog(editedCompetition.getId());
+		assertEquals(5, log.size());
+		assertEquals(LogEventType.TEAM_ADDITION, log.get(0).getType());
+		assertEquals(LogEventType.TEAM_ADDITION, log.get(1).getType());
+		assertEquals(editedCompetition, log.get(0).getCompetition());
+		assertEquals(admin, log.get(0).getAppUser());
+
+		boolean descriptionsOk = false;
+		if ("Team (34)Chicago Bulls has been added".equals(log.get(0).getDescription()) && "Team (33)Orlando Magic has been added".equals(log.get(1).getDescription())) {
+			descriptionsOk = true;
+		}
+		if ("Team (34)Chicago Bulls has been added".equals(log.get(1).getDescription()) && "Team (33)Orlando Magic has been added".equals(log.get(0).getDescription())) {
+			descriptionsOk = true;
+		}
+		assertTrue(descriptionsOk);
+	}
+
+	@Test
+	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
+	public void addOrRemoveTeams_RemoveTeam_TeamIsRemoved() throws NotFoundException {
+		nbaPlayoffs2018.getTeams().remove(bostonCeltics);
+
+		sut.addOrRemoveTeams(nbaPlayoffs2018, admin);
+
+		Competition editedCompetition = sut.get(nbaPlayoffs2018.getId());
+		assertEquals(1, editedCompetition.getTeams().size());
+
+		boolean miamiIsHere = false;
+		boolean bostonIsNotHere = true;
+
+		for (Team team : editedCompetition.getTeams()) {
+			if (bostonCeltics.equals(team)) {
+				bostonIsNotHere = false;
+			} else if (miamiHeat.equals(team)) {
+				miamiIsHere = true;
+			}
+		}
+		assertTrue(miamiIsHere);
+		assertTrue(bostonIsNotHere);
+
+		List<CompetitionLogEvent> log = sut.getLog(editedCompetition.getId());
+		assertEquals(4, log.size());
+		assertEquals(LogEventType.TEAM_REMOVAL, log.get(0).getType());
+		assertEquals(editedCompetition, log.get(0).getCompetition());
+		assertEquals(admin, log.get(0).getAppUser());
+		assertEquals("Team (32)Boston Celtics has been removed", log.get(0).getDescription());
+	}
+
+	@Test
+	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
+	public void addOrRemoveTeams_AddTeamAndRemoveTeam_TeamsAreUpdated() throws NotFoundException {
+		nbaPlayoffs2018.getTeams().remove(bostonCeltics);
+		nbaPlayoffs2018.getTeams().add(teamService.get(chicagoBulls.getId()));
+
+		sut.addOrRemoveTeams(nbaPlayoffs2018, admin);
+
+		Competition editedCompetition = sut.get(nbaPlayoffs2018.getId());
+		assertEquals(2, editedCompetition.getTeams().size());
+
+		boolean miamiIsHere = false;
+		boolean chicagoIsHere = false;
+		boolean bostonIsNotHere = true;
+
+		for (Team team : editedCompetition.getTeams()) {
+			if (bostonCeltics.equals(team)) {
+				bostonIsNotHere = false;
+			} else if (miamiHeat.equals(team)) {
+				miamiIsHere = true;
+			} else if (chicagoBulls.equals(team)) {
+				chicagoIsHere = true;
+			}
+		}
+		assertTrue(miamiIsHere);
+		assertTrue(chicagoIsHere);
+		assertTrue(bostonIsNotHere);
+
+		List<CompetitionLogEvent> log = sut.getLog(editedCompetition.getId());
+		assertEquals(5, log.size());
+		assertEquals(LogEventType.TEAM_REMOVAL, log.get(1).getType());
+		assertEquals(editedCompetition, log.get(1).getCompetition());
+		assertEquals(admin, log.get(1).getAppUser());
+		assertEquals("Team (32)Boston Celtics has been removed", log.get(1).getDescription());
+		assertEquals(LogEventType.TEAM_ADDITION, log.get(0).getType());
+		assertEquals(editedCompetition, log.get(0).getCompetition());
+		assertEquals(admin, log.get(0).getAppUser());
+		assertEquals("Team (34)Chicago Bulls has been added", log.get(0).getDescription());
 	}
 
 	@Test(expected = NullPointerException.class)
