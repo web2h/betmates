@@ -3,6 +3,7 @@ package com.web2h.betmates.restapp.core.service.competition;
 import java.util.List;
 
 import com.web2h.betmates.restapp.core.service.competition.helper.AddedAndRemovedTeams;
+import com.web2h.betmates.restapp.core.service.competition.helper.AddedAndRemovedVenues;
 import com.web2h.betmates.restapp.model.entity.competition.Competition;
 import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEvent;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
@@ -45,5 +46,7 @@ public interface CompetitionLogService {
 	 */
 	void logEdition(Competition oldCompetition, Competition newCompetition, AppUser editor);
 
-	void LogTeamAdditionOrRemoval(Competition competition, AddedAndRemovedTeams addedAndRemovedTeams, AppUser editor);
+	void logTeamAdditionOrRemoval(Competition competition, AddedAndRemovedTeams addedAndRemovedTeams, AppUser editor);
+
+	void logVenueAdditionOrRemoval(Competition competition, AddedAndRemovedVenues addedAndRemovedVenues, AppUser editor);
 }

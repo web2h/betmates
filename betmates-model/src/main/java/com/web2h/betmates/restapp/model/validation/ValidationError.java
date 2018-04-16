@@ -1,5 +1,7 @@
 package com.web2h.betmates.restapp.model.validation;
 
+import java.util.Date;
+
 import org.springframework.validation.FieldError;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -19,6 +21,9 @@ public class ValidationError {
 	/** ERROR_CODE - Error code. */
 	private ErrorCode errorCode;
 
+	/** ORIGINAL_VALUE - Value received in the request. */
+	private String originalValue;
+
 	/** COMPLEMENT - Complement of the error (max length if TOO_LONG error). */
 	private String complement;
 
@@ -26,6 +31,12 @@ public class ValidationError {
 
 		String fieldName = springFieldError.getField().substring(springFieldError.getField().lastIndexOf(".") + 1);
 		field = Field.getByLowerCaseValue(fieldName);
+
+		if (springFieldError.getRejectedValue() instanceof Date) {
+			// TODO
+		} else if (springFieldError.getRejectedValue() != null) {
+			originalValue = springFieldError.getRejectedValue().toString();
+		}
 
 		String code = springFieldError.getCodes()[springFieldError.getCodes().length - 1];
 		if ("Size".equals(code)) {
@@ -69,6 +80,14 @@ public class ValidationError {
 
 	public void setErrorCode(ErrorCode errorCode) {
 		this.errorCode = errorCode;
+	}
+
+	public String getOriginalValue() {
+		return originalValue;
+	}
+
+	public void setOriginalValue(String originalValue) {
+		this.originalValue = originalValue;
 	}
 
 	public String getComplement() {

@@ -59,10 +59,17 @@ CREATE TABLE `competitions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `competition_teams` (
-	`id` INT NOT NULL AUTO_INCREMENT,
 	`competition_id` INT NOT NULL,
 	`team_id` INT NOT NULL,
-	PRIMARY KEY (`id`),
+	PRIMARY KEY (`competition_id`, `team_id`),
 	CONSTRAINT `fk_competition_teams_competitions_competition_id` FOREIGN KEY (`competition_id`) REFERENCES `competitions` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
 	CONSTRAINT `fk_competition_teams_references_team_id` FOREIGN KEY (`team_id`) REFERENCES `basic_references` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `competition_venues` (
+	`competition_id` INT NOT NULL,
+	`venue_id` INT NOT NULL,
+	PRIMARY KEY (`competition_id`, `venue_id`),
+	CONSTRAINT `fk_competition_teams_competitions_competition_id` FOREIGN KEY (`competition_id`) REFERENCES `competitions` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+	CONSTRAINT `fk_competition_teams_references_venue_id` FOREIGN KEY (`venue_id`) REFERENCES `basic_references` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

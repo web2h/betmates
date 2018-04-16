@@ -1,12 +1,14 @@
 package com.web2h.betmates.restapp.model.exception;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
+import com.web2h.betmates.restapp.model.entity.reference.Reference;
 import com.web2h.betmates.restapp.model.http.ErrorResponse;
 import com.web2h.betmates.restapp.model.validation.ErrorCode;
 import com.web2h.betmates.restapp.model.validation.Field;
@@ -26,6 +28,18 @@ public class InvalidDataException extends Exception {
 
 		for (ObjectError error : errors) {
 			errorResponse.getErrors().add(new ValidationError((FieldError) error));
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	public InvalidDataException(Set notFoundReferences, Field field) {
+		super(DEFAULT_MESSAGE);
+		errorResponse = new ErrorResponse(getMessage());
+
+		for (Object reference : notFoundReferences) {
+			ValidationError validationError = new ValidationError(field, ErrorCode.NOT_FOUND);
+			validationError.setOriginalValue(((Reference) reference).getLogValue());
+			errorResponse.getErrors().add(validationError);
 		}
 	}
 

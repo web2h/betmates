@@ -2,6 +2,8 @@ package com.web2h.betmates.restapp.core.service.competition;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -11,14 +13,19 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.base.Preconditions;
 import com.web2h.betmates.restapp.core.service.competition.helper.AddedAndRemovedTeams;
+import com.web2h.betmates.restapp.core.service.competition.helper.AddedAndRemovedVenues;
 import com.web2h.betmates.restapp.model.entity.competition.Competition;
 import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEvent;
 import com.web2h.betmates.restapp.model.entity.reference.Team;
+import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
+import com.web2h.betmates.restapp.model.exception.InvalidDataException;
 import com.web2h.betmates.restapp.model.exception.NotFoundException;
 import com.web2h.betmates.restapp.model.validation.Field;
 import com.web2h.betmates.restapp.persistence.repository.competition.CompetitionRepository;
+import com.web2h.betmates.restapp.persistence.repository.reference.TeamRepository;
+import com.web2h.betmates.restapp.persistence.repository.reference.VenueRepository;
 
 /**
  * Competition service implementation class.
@@ -33,25 +40,47 @@ public class CompetitionServiceImpl implements CompetitionService {
 
 	private CompetitionRepository competitionRepository;
 
+	private TeamRepository teamRepository;
+
+	private VenueRepository venueRepository;
+
 	private CompetitionLogService competitionLogService;
 
-	public CompetitionServiceImpl(CompetitionRepository competitionRepository, CompetitionLogService competitionLogService) {
+	public CompetitionServiceImpl(CompetitionRepository competitionRepository,
+			TeamRepository teamRepository,
+			VenueRepository venueRepository,
+			CompetitionLogService competitionLogService) {
 		this.competitionRepository = competitionRepository;
+		this.teamRepository = teamRepository;
+		this.venueRepository = venueRepository;
 		this.competitionLogService = competitionLogService;
 	}
 
 	@Override
-	public Competition addOrRemoveTeams(Competition competition, AppUser editor) throws NotFoundException {
+	public Competition addOrRemoveTeams(Competition competition, AppUser editor) throws NotFoundException, InvalidDataException {
 		Preconditions.checkNotNull(competition);
 		Preconditions.checkNotNull(editor);
 
-		Competition currentCompetition = competitionRepository.findOne(competition.getId());
-		if (currentCompetition == null) {
-			throw new NotFoundException(Field.ID, Competition.class.getName());
-		}
+		Competition currentCompetition = checkIfCompetitionExists(competition);
+		checkIfTeamsExist(competition.getTeams());
 
 		AddedAndRemovedTeams addedAndRemovedTeams = mergeTeams(currentCompetition, competition);
-		competitionLogService.LogTeamAdditionOrRemoval(currentCompetition, addedAndRemovedTeams, editor);
+		competitionLogService.logTeamAdditionOrRemoval(currentCompetition, addedAndRemovedTeams, editor);
+
+		competitionRepository.save(currentCompetition);
+		return currentCompetition;
+	}
+
+	@Override
+	public Competition addOrRemoveVenues(Competition competition, AppUser editor) throws NotFoundException, InvalidDataException {
+		Preconditions.checkNotNull(competition);
+		Preconditions.checkNotNull(editor);
+
+		Competition currentCompetition = checkIfCompetitionExists(competition);
+		checkIfVenuesExist(competition.getVenues());
+
+		AddedAndRemovedVenues addedAndRemovedVenues = mergeVenues(currentCompetition, competition);
+		competitionLogService.logVenueAdditionOrRemoval(currentCompetition, addedAndRemovedVenues, editor);
 
 		competitionRepository.save(currentCompetition);
 		return currentCompetition;
@@ -62,7 +91,7 @@ public class CompetitionServiceImpl implements CompetitionService {
 		Preconditions.checkNotNull(competition);
 		Preconditions.checkNotNull(creator);
 
-		checkIfExists(competition);
+		checkIfExistWithSameNames(competition);
 
 		competitionLogService.logCreation(competition, creator);
 
@@ -75,12 +104,8 @@ public class CompetitionServiceImpl implements CompetitionService {
 		Preconditions.checkNotNull(competition);
 		Preconditions.checkNotNull(editor);
 
-		Competition currentCompetition = competitionRepository.findOne(competition.getId());
-		if (currentCompetition == null) {
-			throw new NotFoundException(Field.ID, Competition.class.getName());
-		}
-
-		checkIfExists(competition);
+		Competition currentCompetition = checkIfCompetitionExists(competition);
+		checkIfExistWithSameNames(competition);
 
 		competitionLogService.logEdition(currentCompetition, competition, editor);
 
@@ -99,6 +124,14 @@ public class CompetitionServiceImpl implements CompetitionService {
 		return competitionLogService.getLog(competitionId);
 	}
 
+	private Competition checkIfCompetitionExists(Competition competition) throws NotFoundException {
+		Competition currentCompetition = competitionRepository.findOne(competition.getId());
+		if (currentCompetition == null) {
+			throw new NotFoundException(Field.ID, Competition.class.getName());
+		}
+		return currentCompetition;
+	}
+
 	/**
 	 * Checks if the competition already exists to prevent inserting duplicates.
 	 * 
@@ -107,7 +140,7 @@ public class CompetitionServiceImpl implements CompetitionService {
 	 * @throws AlreadyExistsException
 	 *             When the competition already exists
 	 */
-	private void checkIfExists(Competition competition) throws AlreadyExistsException {
+	private void checkIfExistWithSameNames(Competition competition) throws AlreadyExistsException {
 		Competition existingCompetition = competitionRepository.findByNameEn(competition.getNameEn());
 		if (existingCompetition != null && (competition.isBeingCreated() || !competition.getId().equals(existingCompetition.getId()))) {
 			throw new AlreadyExistsException(Field.NAME_EN, Competition.class.getName());
@@ -157,5 +190,55 @@ public class CompetitionServiceImpl implements CompetitionService {
 		}
 
 		return addedAndRemovedTeams;
+	}
+
+	public AddedAndRemovedVenues mergeVenues(Competition currentCompetition, Competition newCompetition) {
+		AddedAndRemovedVenues addedAndRemovedVenues = new AddedAndRemovedVenues();
+
+		// Venues removed from the competition
+		Iterator<Venue> currentVenuesIterator = currentCompetition.getVenues().iterator();
+		while (currentVenuesIterator.hasNext()) {
+			Venue currentVenue = currentVenuesIterator.next();
+			if (!newCompetition.getVenues().contains(currentVenue)) {
+				logger.info("The venue " + currentVenue.getLogValue() + " has been removed from the competition " + currentCompetition.getLogValue());
+				currentVenuesIterator.remove();
+				addedAndRemovedVenues.getRemovedVenues().add(currentVenue);
+			}
+		}
+
+		// New venues to add
+		for (Venue newVenue : newCompetition.getVenues()) {
+			if (!currentCompetition.getVenues().contains(newVenue)) {
+				logger.info("The venue " + newVenue.getLogValue() + " has been added to the competition " + currentCompetition.getLogValue());
+				currentCompetition.getVenues().add(newVenue);
+				addedAndRemovedVenues.getAddedVenues().add(newVenue);
+			}
+		}
+
+		return addedAndRemovedVenues;
+	}
+
+	private void checkIfTeamsExist(Set<Team> teams) throws InvalidDataException {
+		if (teams == null || teams.isEmpty()) {
+			return;
+		}
+		Set<Team> notFoundVenues = teams.stream()
+				.filter(venue -> teamRepository.findOne(venue.getId()) == null)
+				.collect(Collectors.toSet());
+		if (!notFoundVenues.isEmpty()) {
+			throw new InvalidDataException(notFoundVenues, Field.TEAM);
+		}
+	}
+
+	private void checkIfVenuesExist(Set<Venue> venues) throws InvalidDataException {
+		if (venues == null || venues.isEmpty()) {
+			return;
+		}
+		Set<Venue> notFoundVenues = venues.stream()
+				.filter(venue -> venueRepository.findOne(venue.getId()) == null)
+				.collect(Collectors.toSet());
+		if (!notFoundVenues.isEmpty()) {
+			throw new InvalidDataException(notFoundVenues, Field.VENUE);
+		}
 	}
 }

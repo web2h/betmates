@@ -5,11 +5,13 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.web2h.betmates.restapp.core.service.competition.helper.AddedAndRemovedTeams;
+import com.web2h.betmates.restapp.core.service.competition.helper.AddedAndRemovedVenues;
 import com.web2h.betmates.restapp.model.entity.competition.Competition;
 import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEvent;
 import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEventChange;
 import com.web2h.betmates.restapp.model.entity.log.LogEventType;
 import com.web2h.betmates.restapp.model.entity.reference.Team;
+import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.validation.Field;
 import com.web2h.betmates.restapp.persistence.repository.competition.CompetitionLogEventRepository;
@@ -67,7 +69,7 @@ public class CompetitionLogServiceImpl implements CompetitionLogService {
 	}
 
 	@Override
-	public void LogTeamAdditionOrRemoval(Competition competition, AddedAndRemovedTeams addedAndRemovedTeams, AppUser editor) {
+	public void logTeamAdditionOrRemoval(Competition competition, AddedAndRemovedTeams addedAndRemovedTeams, AppUser editor) {
 		for (Team removedTeam : addedAndRemovedTeams.getRemovedTeams()) {
 			CompetitionLogEvent event = new CompetitionLogEvent(competition, LogEventType.TEAM_REMOVAL, editor);
 			event.setDescription("Team " + removedTeam.getLogValue() + " has been removed");
@@ -77,6 +79,21 @@ public class CompetitionLogServiceImpl implements CompetitionLogService {
 		for (Team addedTeam : addedAndRemovedTeams.getAddedTeams()) {
 			CompetitionLogEvent event = new CompetitionLogEvent(competition, LogEventType.TEAM_ADDITION, editor);
 			event.setDescription("Team " + addedTeam.getLogValue() + " has been added");
+			competitionLogEventRepository.save(event);
+		}
+	}
+
+	@Override
+	public void logVenueAdditionOrRemoval(Competition competition, AddedAndRemovedVenues addedAndRemovedVenues, AppUser editor) {
+		for (Venue removedVenue : addedAndRemovedVenues.getRemovedVenues()) {
+			CompetitionLogEvent event = new CompetitionLogEvent(competition, LogEventType.VENUE_REMOVAL, editor);
+			event.setDescription("Venue " + removedVenue.getLogValue() + " has been removed");
+			competitionLogEventRepository.save(event);
+		}
+
+		for (Venue addedVenue : addedAndRemovedVenues.getAddedVenues()) {
+			CompetitionLogEvent event = new CompetitionLogEvent(competition, LogEventType.VENUE_ADDITION, editor);
+			event.setDescription("Venue " + addedVenue.getLogValue() + " has been added");
 			competitionLogEventRepository.save(event);
 		}
 	}

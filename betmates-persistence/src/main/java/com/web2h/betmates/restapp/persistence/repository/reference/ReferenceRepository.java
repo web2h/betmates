@@ -1,8 +1,11 @@
 package com.web2h.betmates.restapp.persistence.repository.reference;
 
 import java.io.Serializable;
+import java.util.List;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import com.web2h.betmates.restapp.model.entity.reference.Reference;
 
@@ -12,6 +15,9 @@ import com.web2h.betmates.restapp.model.entity.reference.Reference;
  * @author web2h
  */
 public interface ReferenceRepository<R extends Reference> extends CrudRepository<R, Serializable> {
+
+	@Query("SELECT COUNT(r) FROM Reference r WHERE r.id IN :referenceIds")
+	int countByReferenceIds(@Param("referenceIds") List<Long> referenceIds);
 
 	/**
 	 * Retrieves a reference by its English name

@@ -48,6 +48,7 @@ import com.web2h.tools.StringTools;
 @ContextConfiguration(classes = { ApplicationTest.class })
 @Import(value = WebSecurityTest.class)
 @WithMockUser
+// TODO unit test addOrRemove methods
 public class CompetitionControllerTest extends CommonControllerTest {
 
 	@MockBean

@@ -22,7 +22,9 @@ public enum Field {
 	SHORT_NAME_FR("shortNameFr"),
 	SPORT("sport"),
 	START_DATE("startDate"),
-	TYPE("type");
+	TEAM("Team"),
+	TYPE("type"),
+	VENUE("Venue");
 
 	private Field(String lowerCaseValue) {
 		this.lowerCaseValue = lowerCaseValue;

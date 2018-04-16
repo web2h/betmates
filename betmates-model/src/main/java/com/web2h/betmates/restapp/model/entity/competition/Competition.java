@@ -31,6 +31,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.web2h.betmates.restapp.model.deserializer.JsonTrimmerDeserializer;
 import com.web2h.betmates.restapp.model.entity.reference.Team;
+import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.validation.Field;
 import com.web2h.betmates.restapp.model.validation.group.CreationChecks;
 import com.web2h.betmates.restapp.model.validation.group.EditionChecks;
@@ -83,6 +84,11 @@ public class Competition {
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "competition_teams", joinColumns = @JoinColumn(name = "competition_id"), inverseJoinColumns = @JoinColumn(name = "team_id"))
 	private Set<Team> teams = new HashSet<>();
+
+	/** VENUES - Venues where games will be held for that competition. */
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name = "competition_venues", joinColumns = @JoinColumn(name = "competition_id"), inverseJoinColumns = @JoinColumn(name = "venue_id"))
+	private Set<Venue> venues = new HashSet<>();
 
 	@Override
 	public int hashCode() {
@@ -177,5 +183,9 @@ public class Competition {
 
 	public Set<Team> getTeams() {
 		return teams;
+	}
+
+	public Set<Venue> getVenues() {
+		return venues;
 	}
 }

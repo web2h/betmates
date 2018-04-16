@@ -25,21 +25,31 @@ public class CommonTest {
 	protected City paris;
 	protected City lille;
 	protected City brussels;
+	protected City boston;
+	protected City chicago;
+	protected City miami;
 
 	protected Competition worldCup2018;
 	protected Competition nbaPlayoffs2018;
 
 	protected Country france;
 	protected Country belgium;
+	protected Country canada;
+	protected Country usa;
 
 	protected Team bostonCeltics;
 	protected Team miamiHeat;
 	protected Team orlandoMagic;
 	protected Team chicagoBulls;
+	protected Team unknownTeam;
 
 	protected Venue parcDesPrinces;
 	protected Venue stadeCharlety;
 	protected Venue stadeDuRoiBaudouin;
+	protected Venue tdGarden;
+	protected Venue aaArena;
+	protected Venue uCenter;
+	protected Venue unknownVenue;
 
 	@Before
 	public void before() {
@@ -52,11 +62,17 @@ public class CommonTest {
 		createCompetitions();
 		createTeams();
 		addTeamsToCompetitions();
+		addVenuesToCompetitions();
 	}
 
 	private void addTeamsToCompetitions() {
 		nbaPlayoffs2018.getTeams().add(bostonCeltics);
 		nbaPlayoffs2018.getTeams().add(miamiHeat);
+	}
+
+	private void addVenuesToCompetitions() {
+		nbaPlayoffs2018.getVenues().add(aaArena);
+		nbaPlayoffs2018.getVenues().add(tdGarden);
 	}
 
 	private void createCities() {
@@ -77,6 +93,24 @@ public class CommonTest {
 		brussels.setNameEn("Brussels");
 		brussels.setNameFr("Bruxelles");
 		brussels.setCountry(belgium);
+
+		boston = new City();
+		boston.setId(14l);
+		boston.setNameEn("Boston");
+		boston.setNameFr("Boston");
+		boston.setCountry(usa);
+
+		chicago = new City();
+		chicago.setId(15l);
+		chicago.setNameEn("Chicago");
+		chicago.setNameFr("Chicago");
+		chicago.setCountry(usa);
+
+		miami = new City();
+		miami.setId(16l);
+		miami.setNameEn("Miami");
+		miami.setNameFr("Miami");
+		miami.setCountry(usa);
 	}
 
 	private void createCompetitions() {
@@ -113,6 +147,16 @@ public class CommonTest {
 		belgium.setId(2l);
 		belgium.setNameEn("Belgium");
 		belgium.setNameFr("Belgique");
+
+		canada = new Country();
+		canada.setId(3l);
+		canada.setNameEn("Canada");
+		canada.setNameFr("Canada");
+
+		usa = new Country();
+		usa.setId(4l);
+		usa.setNameEn("USA");
+		usa.setNameFr("EUA");
 	}
 
 	private void createTeams() {
@@ -147,6 +191,14 @@ public class CommonTest {
 		chicagoBulls.setSport(Sport.BASKET_BALL);
 		chicagoBulls.setShortNameEn("Bulls");
 		chicagoBulls.setShortNameFr("Bulls");
+
+		unknownTeam = new Team();
+		unknownTeam.setId(999l);
+		unknownTeam.setNameEn("Las Vegas Unknowns");
+		unknownTeam.setNameFr("Las Vegas Unknowns");
+		unknownTeam.setSport(Sport.BASKET_BALL);
+		unknownTeam.setShortNameEn("Unknowns");
+		unknownTeam.setShortNameFr("Unknowns");
 	}
 
 	private void createVenues() {
@@ -167,5 +219,29 @@ public class CommonTest {
 		stadeDuRoiBaudouin.setNameEn("Stade du Roi Baudouin");
 		stadeDuRoiBaudouin.setNameFr("Stade du Roi Baudouin");
 		stadeDuRoiBaudouin.setCity(brussels);
+
+		tdGarden = new Venue();
+		tdGarden.setId(24l);
+		tdGarden.setNameEn("TD Garden");
+		tdGarden.setNameFr("TD Garden");
+		tdGarden.setCity(boston);
+
+		uCenter = new Venue();
+		uCenter.setId(25l);
+		uCenter.setNameEn("United Center");
+		uCenter.setNameFr("United Center");
+		uCenter.setCity(chicago);
+
+		aaArena = new Venue();
+		aaArena.setId(26l);
+		aaArena.setNameEn("American Airlines Arena");
+		aaArena.setNameFr("American Airlines Arena");
+		aaArena.setCity(miami);
+
+		unknownVenue = new Venue();
+		unknownVenue.setId(9999l);
+		unknownVenue.setNameEn("Unknown Stadium");
+		unknownVenue.setNameFr("Stade Inconnu");
+		unknownVenue.setCity(paris);
 	}
 }

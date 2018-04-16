@@ -11,6 +11,7 @@ public interface UrlConstants {
 	String VENUE_PREFIX = "/venue";
 
 	String ADD_OR_REMOVE_TEAM_ACTION = "/add-or-remove-team";
+	String ADD_OR_REMOVE_VENUE_ACTION = "/add-or-remove-venue";
 	String LOGIN_ACTION = "/login";
 	String SIGN_UP_ACTION = "/sign-up";
 

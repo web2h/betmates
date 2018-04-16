@@ -6,6 +6,7 @@ import com.web2h.betmates.restapp.model.entity.competition.Competition;
 import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEvent;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
+import com.web2h.betmates.restapp.model.exception.InvalidDataException;
 import com.web2h.betmates.restapp.model.exception.NotFoundException;
 
 /**
@@ -15,7 +16,9 @@ import com.web2h.betmates.restapp.model.exception.NotFoundException;
  */
 public interface CompetitionService {
 
-	Competition addOrRemoveTeams(Competition competition, AppUser editor) throws NotFoundException;
+	Competition addOrRemoveTeams(Competition competition, AppUser editor) throws NotFoundException, InvalidDataException;
+
+	Competition addOrRemoveVenues(Competition competition, AppUser editor) throws NotFoundException, InvalidDataException;
 
 	/**
 	 * Creates a new competition.

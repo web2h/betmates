@@ -21,12 +21,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.web2h.betmates.restapp.core.service.CommonTest;
 import com.web2h.betmates.restapp.core.service.reference.TeamService;
+import com.web2h.betmates.restapp.core.service.reference.VenueService;
 import com.web2h.betmates.restapp.model.entity.competition.Competition;
 import com.web2h.betmates.restapp.model.entity.competition.CompetitionType;
 import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEvent;
 import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEventChange;
 import com.web2h.betmates.restapp.model.entity.log.LogEventType;
 import com.web2h.betmates.restapp.model.entity.reference.Team;
+import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
@@ -49,6 +51,9 @@ public class CompetitionServiceTest extends CommonTest {
 	@Autowired
 	private TeamService teamService;
 
+	@Autowired
+	private VenueService venueService;
+
 	private Date someDate;
 
 	private Date someDate2;
@@ -65,12 +70,12 @@ public class CompetitionServiceTest extends CommonTest {
 	}
 
 	@Test(expected = NullPointerException.class)
-	public void addOrRemoveTeams_WithNullCompetition_ThrowNullPointerException() throws NotFoundException {
+	public void addOrRemoveTeams_WithNullCompetition_ThrowNullPointerException() throws Exception {
 		sut.addOrRemoveTeams(null, new AppUser());
 	}
 
 	@Test(expected = NullPointerException.class)
-	public void addOrRemoveTeams_WithNullEditor_ThrowNullPointerException() throws NotFoundException {
+	public void addOrRemoveTeams_WithNullEditor_ThrowNullPointerException() throws Exception {
 		sut.addOrRemoveTeams(new Competition(), null);
 	}
 
@@ -90,7 +95,22 @@ public class CompetitionServiceTest extends CommonTest {
 
 	@Test
 	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
-	public void addOrRemoveTeams_AddTeams_TeamsAreAdded() throws NotFoundException {
+	public void addOrRemoveTeams_WithUnknownTeam_ThrowInvalidDataException() throws Exception {
+		nbaPlayoffs2018.getTeams().add(teamService.get(chicagoBulls.getId()));
+		nbaPlayoffs2018.getTeams().add(unknownTeam);
+
+		try {
+			sut.addOrRemoveTeams(nbaPlayoffs2018, admin);
+			fail("Team change should never succeed");
+		} catch (Exception e) {
+			assertTrue(e instanceof InvalidDataException);
+			assertEquals(InvalidDataException.DEFAULT_MESSAGE, e.getMessage());
+		}
+	}
+
+	@Test
+	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
+	public void addOrRemoveTeams_AddTeams_TeamsAreAdded() throws Exception {
 		nbaPlayoffs2018.getTeams().add(teamService.get(chicagoBulls.getId()));
 		nbaPlayoffs2018.getTeams().add(teamService.get(orlandoMagic.getId()));
 
@@ -121,7 +141,7 @@ public class CompetitionServiceTest extends CommonTest {
 		assertTrue(orlandoIsHere);
 
 		List<CompetitionLogEvent> log = sut.getLog(editedCompetition.getId());
-		assertEquals(5, log.size());
+		assertEquals(7, log.size());
 		assertEquals(LogEventType.TEAM_ADDITION, log.get(0).getType());
 		assertEquals(LogEventType.TEAM_ADDITION, log.get(1).getType());
 		assertEquals(editedCompetition, log.get(0).getCompetition());
@@ -139,7 +159,7 @@ public class CompetitionServiceTest extends CommonTest {
 
 	@Test
 	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
-	public void addOrRemoveTeams_RemoveTeam_TeamIsRemoved() throws NotFoundException {
+	public void addOrRemoveTeams_RemoveTeam_TeamIsRemoved() throws Exception {
 		nbaPlayoffs2018.getTeams().remove(bostonCeltics);
 
 		sut.addOrRemoveTeams(nbaPlayoffs2018, admin);
@@ -161,7 +181,7 @@ public class CompetitionServiceTest extends CommonTest {
 		assertTrue(bostonIsNotHere);
 
 		List<CompetitionLogEvent> log = sut.getLog(editedCompetition.getId());
-		assertEquals(4, log.size());
+		assertEquals(6, log.size());
 		assertEquals(LogEventType.TEAM_REMOVAL, log.get(0).getType());
 		assertEquals(editedCompetition, log.get(0).getCompetition());
 		assertEquals(admin, log.get(0).getAppUser());
@@ -170,7 +190,7 @@ public class CompetitionServiceTest extends CommonTest {
 
 	@Test
 	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
-	public void addOrRemoveTeams_AddTeamAndRemoveTeam_TeamsAreUpdated() throws NotFoundException {
+	public void addOrRemoveTeams_AddTeamAndRemoveTeam_TeamsAreUpdated() throws Exception {
 		nbaPlayoffs2018.getTeams().remove(bostonCeltics);
 		nbaPlayoffs2018.getTeams().add(teamService.get(chicagoBulls.getId()));
 
@@ -197,7 +217,7 @@ public class CompetitionServiceTest extends CommonTest {
 		assertTrue(bostonIsNotHere);
 
 		List<CompetitionLogEvent> log = sut.getLog(editedCompetition.getId());
-		assertEquals(5, log.size());
+		assertEquals(7, log.size());
 		assertEquals(LogEventType.TEAM_REMOVAL, log.get(1).getType());
 		assertEquals(editedCompetition, log.get(1).getCompetition());
 		assertEquals(admin, log.get(1).getAppUser());
@@ -206,6 +226,150 @@ public class CompetitionServiceTest extends CommonTest {
 		assertEquals(editedCompetition, log.get(0).getCompetition());
 		assertEquals(admin, log.get(0).getAppUser());
 		assertEquals("Team (34)Chicago Bulls has been added", log.get(0).getDescription());
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void addOrRemoveVenues_WithNullCompetition_ThrowNullPointerException() throws Exception {
+		sut.addOrRemoveVenues(null, new AppUser());
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void addOrRemoveVenues_WithNullEditor_ThrowNullPointerException() throws Exception {
+		sut.addOrRemoveVenues(new Competition(), null);
+	}
+
+	@Test
+	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
+	public void addOrRemoveVenues_WithUnknownCompetition_ThrowNotFoundException() throws NotFoundException {
+		nbaPlayoffs2018.setId(10000l);
+
+		try {
+			sut.addOrRemoveVenues(nbaPlayoffs2018, admin);
+			fail("Venue change should never succeed");
+		} catch (Exception e) {
+			assertTrue(e instanceof NotFoundException);
+			assertEquals(NotFoundException.messages.get(Field.ID.name() + Competition.class.getName()), e.getMessage());
+		}
+	}
+
+	@Test
+	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
+	public void addOrRemoveVenues_WithUnknownTeam_ThrowInvalidDataException() throws Exception {
+		nbaPlayoffs2018.getVenues().add(unknownVenue);
+
+		try {
+			sut.addOrRemoveVenues(nbaPlayoffs2018, admin);
+			fail("Venue change should never succeed");
+		} catch (Exception e) {
+			assertTrue(e instanceof InvalidDataException);
+			assertEquals(InvalidDataException.DEFAULT_MESSAGE, e.getMessage());
+		}
+	}
+
+	@Test
+	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
+	public void addOrRemoveVenues_AddVenues_VenuesAreAdded() throws Exception {
+		nbaPlayoffs2018.getVenues().add(venueService.get(uCenter.getId()));
+
+		sut.addOrRemoveVenues(nbaPlayoffs2018, admin);
+
+		Competition editedCompetition = sut.get(nbaPlayoffs2018.getId());
+		assertEquals(3, editedCompetition.getVenues().size());
+
+		boolean aaArenaIsHere = false;
+		boolean uCenterIsHere = false;
+		boolean tdGardenIsHere = false;
+
+		for (Venue venue : editedCompetition.getVenues()) {
+			if (tdGarden.equals(venue)) {
+				tdGardenIsHere = true;
+			} else if (aaArena.equals(venue)) {
+				aaArenaIsHere = true;
+			} else if (uCenter.equals(venue)) {
+				uCenterIsHere = true;
+			}
+		}
+		assertTrue(aaArenaIsHere);
+		assertTrue(tdGardenIsHere);
+		assertTrue(uCenterIsHere);
+
+		List<CompetitionLogEvent> log = sut.getLog(editedCompetition.getId());
+		assertEquals(6, log.size());
+		assertEquals(LogEventType.VENUE_ADDITION, log.get(0).getType());
+		assertEquals(editedCompetition, log.get(0).getCompetition());
+		assertEquals(admin, log.get(0).getAppUser());
+		assertEquals("Venue (25)United Center has been added", log.get(0).getDescription());
+	}
+
+	@Test
+	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
+	public void addOrRemoveVenues_RemoveVenue_VenueIsRemoved() throws Exception {
+		nbaPlayoffs2018.getVenues().remove(tdGarden);
+
+		sut.addOrRemoveVenues(nbaPlayoffs2018, admin);
+
+		Competition editedCompetition = sut.get(nbaPlayoffs2018.getId());
+		assertEquals(1, editedCompetition.getVenues().size());
+
+		boolean aaArenaIsHere = false;
+		boolean tdGardenIsNotHere = true;
+
+		for (Venue venue : editedCompetition.getVenues()) {
+			if (tdGarden.equals(venue)) {
+				tdGardenIsNotHere = false;
+			} else if (aaArena.equals(venue)) {
+				aaArenaIsHere = true;
+			}
+		}
+		assertTrue(aaArenaIsHere);
+		assertTrue(tdGardenIsNotHere);
+
+		List<CompetitionLogEvent> log = sut.getLog(editedCompetition.getId());
+		assertEquals(6, log.size());
+		assertEquals(LogEventType.VENUE_REMOVAL, log.get(0).getType());
+		assertEquals(editedCompetition, log.get(0).getCompetition());
+		assertEquals(admin, log.get(0).getAppUser());
+		assertEquals("Venue (24)TD Garden has been removed", log.get(0).getDescription());
+	}
+
+	@Test
+	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
+	public void addOrRemoveVenues_AddVenueAndRemoveVenue_VenuesAreUpdated() throws Exception {
+		nbaPlayoffs2018.getVenues().remove(tdGarden);
+		nbaPlayoffs2018.getVenues().add(venueService.get(uCenter.getId()));
+
+		sut.addOrRemoveVenues(nbaPlayoffs2018, admin);
+
+		Competition editedCompetition = sut.get(nbaPlayoffs2018.getId());
+		assertEquals(2, editedCompetition.getVenues().size());
+
+		boolean aaArenaIsHere = false;
+		boolean uCenterIsHere = false;
+		boolean tdGardenIsNotHere = true;
+
+		for (Venue venue : editedCompetition.getVenues()) {
+			if (tdGarden.equals(venue)) {
+				tdGardenIsNotHere = false;
+			} else if (aaArena.equals(venue)) {
+				aaArenaIsHere = true;
+			} else if (uCenter.equals(venue)) {
+				uCenterIsHere = true;
+			}
+		}
+		assertTrue(uCenterIsHere);
+		assertTrue(aaArenaIsHere);
+		assertTrue(tdGardenIsNotHere);
+
+		List<CompetitionLogEvent> log = sut.getLog(editedCompetition.getId());
+		assertEquals(7, log.size());
+		assertEquals(LogEventType.VENUE_REMOVAL, log.get(1).getType());
+		assertEquals(editedCompetition, log.get(1).getCompetition());
+		assertEquals(admin, log.get(1).getAppUser());
+		assertEquals("Venue (24)TD Garden has been removed", log.get(1).getDescription());
+		assertEquals(LogEventType.VENUE_ADDITION, log.get(0).getType());
+		assertEquals(editedCompetition, log.get(0).getCompetition());
+		assertEquals(admin, log.get(0).getAppUser());
+		assertEquals("Venue (25)United Center has been added", log.get(0).getDescription());
 	}
 
 	@Test(expected = NullPointerException.class)
