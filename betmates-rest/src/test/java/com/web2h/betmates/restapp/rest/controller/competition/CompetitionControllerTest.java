@@ -1,6 +1,8 @@
 package com.web2h.betmates.restapp.rest.controller.competition;
 
 import static com.web2h.betmates.restapp.model.entity.FieldLength.NAME_MAX_LENGTH;
+import static com.web2h.betmates.restapp.rest.controller.UrlConstants.COMPETITION_ADD_OR_REMOVE_TEAMS_URL;
+import static com.web2h.betmates.restapp.rest.controller.UrlConstants.COMPETITION_ADD_OR_REMOVE_VENUES_URL;
 import static com.web2h.betmates.restapp.rest.controller.UrlConstants.COMPETITION_CREATION_URL;
 import static com.web2h.betmates.restapp.rest.controller.UrlConstants.COMPETITION_EDITION_URL;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -48,7 +50,6 @@ import com.web2h.tools.StringTools;
 @ContextConfiguration(classes = { ApplicationTest.class })
 @Import(value = WebSecurityTest.class)
 @WithMockUser
-// TODO unit test addOrRemove methods
 public class CompetitionControllerTest extends CommonControllerTest {
 
 	@MockBean
@@ -61,6 +62,80 @@ public class CompetitionControllerTest extends CommonControllerTest {
 	public void before() throws Exception {
 		given(competitionService.create(anyObject(), anyObject())).willReturn(null);
 		doReturn(null).when(competitionController).getLoggedInUser();
+	}
+
+	@Test
+	public void addOrRemoveTeams_WithValidData_ShouldReturnOk() throws Exception {
+		Competition competition = createValidCompetitionForEdition();
+		String jsonCompetition = asJsonString(competition);
+		given(competitionService.addOrRemoveTeams(anyObject(), anyObject())).willReturn(competition);
+
+		ResultActions actions = mockMvc.perform(post(COMPETITION_ADD_OR_REMOVE_TEAMS_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
+		actions.andExpect(status().isOk());
+		Assert.assertEquals(asJsonString(competition), actions.andReturn().getResponse().getContentAsString());
+	}
+
+	@Test
+	public void addOrRemoveTeams_UnknownCompetition_ShouldReturnNotFound() throws Exception {
+		Competition competition = createValidCompetitionForEdition();
+		String jsonCompetition = asJsonString(competition);
+		given(competitionService.addOrRemoveTeams(anyObject(), anyObject())).willThrow(new NotFoundException(Field.ID, Competition.class.getName()));
+
+		ResultActions actions = mockMvc.perform(post(COMPETITION_ADD_OR_REMOVE_TEAMS_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
+		actions.andExpect(status().isNotFound());
+		actions.andExpect(jsonPath("$.message", equalTo(NotFoundException.messages.get(Field.ID.name() + Competition.class.getName()))));
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.ID.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.NOT_FOUND.getJsonValue())));
+	}
+
+	@Test
+	public void addOrRemoveTeams_InternalError_ShouldReturnInternalError() throws Exception {
+		Competition competition = createValidCompetitionForEdition();
+		String jsonCompetition = asJsonString(competition);
+		given(competitionService.addOrRemoveTeams(anyObject(), anyObject())).willThrow(new RuntimeException("message"));
+
+		ResultActions actions = mockMvc.perform(post(COMPETITION_ADD_OR_REMOVE_TEAMS_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
+		actions.andExpect(status().isInternalServerError());
+		actions.andExpect(jsonPath("$.message", equalTo("message")));
+		actions.andExpect(jsonPath("$.errors", hasSize(0)));
+	}
+
+	@Test
+	public void addOrRemoveVenuess_WithValidData_ShouldReturnOk() throws Exception {
+		Competition competition = createValidCompetitionForEdition();
+		String jsonCompetition = asJsonString(competition);
+		given(competitionService.addOrRemoveVenues(anyObject(), anyObject())).willReturn(competition);
+
+		ResultActions actions = mockMvc.perform(post(COMPETITION_ADD_OR_REMOVE_VENUES_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
+		actions.andExpect(status().isOk());
+		Assert.assertEquals(asJsonString(competition), actions.andReturn().getResponse().getContentAsString());
+	}
+
+	@Test
+	public void addOrRemoveVenues_UnknownCompetition_ShouldReturnNotFound() throws Exception {
+		Competition competition = createValidCompetitionForEdition();
+		String jsonCompetition = asJsonString(competition);
+		given(competitionService.addOrRemoveVenues(anyObject(), anyObject())).willThrow(new NotFoundException(Field.ID, Competition.class.getName()));
+
+		ResultActions actions = mockMvc.perform(post(COMPETITION_ADD_OR_REMOVE_VENUES_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
+		actions.andExpect(status().isNotFound());
+		actions.andExpect(jsonPath("$.message", equalTo(NotFoundException.messages.get(Field.ID.name() + Competition.class.getName()))));
+		actions.andExpect(jsonPath("$.errors", hasSize(1)));
+		actions.andExpect(jsonPath("$.errors[0].field", equalTo(Field.ID.toString())));
+		actions.andExpect(jsonPath("$.errors[0].errorCode", equalTo(ErrorCode.NOT_FOUND.getJsonValue())));
+	}
+
+	@Test
+	public void addOrRemoveVenues_InternalError_ShouldReturnInternalError() throws Exception {
+		Competition competition = createValidCompetitionForEdition();
+		String jsonCompetition = asJsonString(competition);
+		given(competitionService.addOrRemoveVenues(anyObject(), anyObject())).willThrow(new RuntimeException("message"));
+
+		ResultActions actions = mockMvc.perform(post(COMPETITION_ADD_OR_REMOVE_VENUES_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
+		actions.andExpect(status().isInternalServerError());
+		actions.andExpect(jsonPath("$.message", equalTo("message")));
+		actions.andExpect(jsonPath("$.errors", hasSize(0)));
 	}
 
 	@Test

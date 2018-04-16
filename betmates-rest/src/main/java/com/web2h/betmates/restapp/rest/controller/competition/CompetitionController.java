@@ -63,6 +63,9 @@ public class CompetitionController extends CommonController {
 		} catch (NotFoundException nfe) {
 			logger.warn(nfe.getMessage());
 			return nfe.getResponseEntity();
+		} catch (InvalidDataException ide) {
+			logger.warn(ide.getMessage());
+			return ide.getResponseEntity();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return new InternalErrorException(e.getMessage()).getResponseEntity();
@@ -86,6 +89,9 @@ public class CompetitionController extends CommonController {
 		} catch (NotFoundException nfe) {
 			logger.warn(nfe.getMessage());
 			return nfe.getResponseEntity();
+		} catch (InvalidDataException ide) {
+			logger.warn(ide.getMessage());
+			return ide.getResponseEntity();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return new InternalErrorException(e.getMessage()).getResponseEntity();
