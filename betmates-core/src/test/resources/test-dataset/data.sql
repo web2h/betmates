@@ -34,12 +34,12 @@ INSERT INTO competitions (`id`, `name_en`, `name_fr`, `competition_type`, `start
 INSERT INTO competitions (`id`, `name_en`, `name_fr`, `competition_type`, `start_date`) VALUES (2, 'NBA Playoffs 2018', 'NBA Playoffs 2018', 'NBA_PLAYOFFS', '2018-04-15 20:00:00');
 
 -- COMPETITION_TEAMS
-INSERT INTO `competition_teams` (`competition_id`, `team_id`) VALUES (2, 31);
-INSERT INTO `competition_teams` (`competition_id`, `team_id`) VALUES (2, 32);
+INSERT INTO competition_teams (`id`, `competition_id`, `team_id`) VALUES (1, 2, 31);
+INSERT INTO competition_teams (`id`, `competition_id`, `team_id`) VALUES (2, 2, 32);
 
 -- COMPETITION_VENUES
-INSERT INTO `competition_venues` (`competition_id`, `venue_id`) VALUES (2, 24);
-INSERT INTO `competition_venues` (`competition_id`, `venue_id`) VALUES (2, 26);
+INSERT INTO competition_venues (`competition_id`, `venue_id`) VALUES (2, 24);
+INSERT INTO competition_venues (`competition_id`, `venue_id`) VALUES (2, 26);
 
 -- REFERENCE_LOG_EVENTS
 INSERT INTO reference_log_events (`id`, `app_user_id`, `event_ts`, `event_type`, `reference_id`) VALUES (1, 1, '2018-04-01 18:00:00', 'CREATION', 1);

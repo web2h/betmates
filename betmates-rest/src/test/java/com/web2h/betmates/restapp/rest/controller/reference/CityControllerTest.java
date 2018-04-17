@@ -120,7 +120,7 @@ public class CityControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithUnknownCountry_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForCreation();
-		given(cityService.create(anyObject(), anyObject())).willThrow(new InvalidDataException(Field.COUNTRY, ErrorCode.NOT_FOUND));
+		given(cityService.create(anyObject(), anyObject())).willThrow(InvalidDataException.createWithFieldAndErrorCode(Field.COUNTRY, ErrorCode.NOT_FOUND));
 
 		ResultActions actions = mockMvc.perform(post(CITY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
 		actions.andExpect(status().isBadRequest());
@@ -224,7 +224,7 @@ public class CityControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithUnknownCountry_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForEdition();
-		given(cityService.edit(anyObject(), anyObject())).willThrow(new InvalidDataException(Field.COUNTRY, ErrorCode.NOT_FOUND));
+		given(cityService.edit(anyObject(), anyObject())).willThrow(InvalidDataException.createWithFieldAndErrorCode(Field.COUNTRY, ErrorCode.NOT_FOUND));
 
 		ResultActions actions = mockMvc.perform(put(CITY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
 		actions.andExpect(status().isBadRequest());

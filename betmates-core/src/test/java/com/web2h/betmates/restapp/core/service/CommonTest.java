@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.web2h.betmates.restapp.model.entity.competition.Competition;
+import com.web2h.betmates.restapp.model.entity.competition.CompetitionGroup;
 import com.web2h.betmates.restapp.model.entity.competition.CompetitionType;
 import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
@@ -66,8 +67,8 @@ public class CommonTest {
 	}
 
 	private void addTeamsToCompetitions() {
-		nbaPlayoffs2018.getTeams().add(bostonCeltics);
-		nbaPlayoffs2018.getTeams().add(miamiHeat);
+		nbaPlayoffs2018.addTeam(bostonCeltics, CompetitionGroup.EAST, 2);
+		nbaPlayoffs2018.addTeam(miamiHeat, CompetitionGroup.EAST, 6);
 	}
 
 	private void addVenuesToCompetitions() {

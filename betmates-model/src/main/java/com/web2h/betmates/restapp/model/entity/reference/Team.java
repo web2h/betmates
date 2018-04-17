@@ -4,11 +4,15 @@ import static com.web2h.betmates.restapp.model.entity.FieldLength.SHORT_NAME_MAX
 import static com.web2h.betmates.restapp.model.entity.FieldLength.SPORT_MAX_LENGTH;
 import static com.web2h.betmates.restapp.model.entity.FieldLength.TEXT_MIN_LENGTH;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -18,6 +22,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.web2h.betmates.restapp.model.deserializer.JsonTrimmerDeserializer;
+import com.web2h.betmates.restapp.model.entity.competition.CompetitionTeam;
 import com.web2h.betmates.restapp.model.validation.Field;
 import com.web2h.tools.StringTools;
 
@@ -50,6 +55,10 @@ public class Team extends Reference {
 	@Size(min = TEXT_MIN_LENGTH, max = SHORT_NAME_MAX_LENGTH)
 	@JsonDeserialize(using = JsonTrimmerDeserializer.class)
 	private String shortNameFr;
+
+	/** COMPETITIONS - Competitions played by this team. */
+	@OneToMany(mappedBy = "team")
+	private Set<CompetitionTeam> competitions = new HashSet<>();
 
 	@Override
 	public int hashCode() {

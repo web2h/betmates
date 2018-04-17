@@ -42,7 +42,7 @@ public abstract class ReferenceController<R extends Reference> extends CommonCon
 	 */
 	public ResponseEntity<Object> create(R reference, BindingResult result) {
 		if (result.hasErrors()) {
-			InvalidDataException ide = new InvalidDataException(result.getAllErrors());
+			InvalidDataException ide = InvalidDataException.createWithErrorList(result.getAllErrors());
 			getLogger().warn("Invalid data");
 			return ide.getResponseEntity();
 		}
@@ -75,7 +75,7 @@ public abstract class ReferenceController<R extends Reference> extends CommonCon
 	 */
 	public ResponseEntity<Object> edit(R reference, BindingResult result) {
 		if (result.hasErrors()) {
-			InvalidDataException ide = new InvalidDataException(result.getAllErrors());
+			InvalidDataException ide = InvalidDataException.createWithErrorList(result.getAllErrors());
 			getLogger().warn("Invalid data");
 			return ide.getResponseEntity();
 		}

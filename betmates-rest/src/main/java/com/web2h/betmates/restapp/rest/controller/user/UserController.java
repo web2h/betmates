@@ -37,7 +37,7 @@ public class UserController extends CommonController {
 		logger.info("User sign up - " + user);
 
 		if (result.hasErrors()) {
-			InvalidDataException ide = new InvalidDataException(result.getAllErrors());
+			InvalidDataException ide = InvalidDataException.createWithErrorList(result.getAllErrors());
 			logger.warn("Invalid data");
 			return ide.getResponseEntity();
 		}

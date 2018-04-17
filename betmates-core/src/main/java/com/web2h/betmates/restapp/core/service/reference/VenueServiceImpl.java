@@ -53,7 +53,7 @@ public class VenueServiceImpl extends ReferenceServiceImpl<Venue> implements Ven
 		City city = cityRepository.findOne(venue.getCity().getId());
 		if (city == null) {
 			logger.warn("No city exists with the given ID [" + venue.getCity().getId() + "]");
-			throw new InvalidDataException(Field.CITY, ErrorCode.NOT_FOUND);
+			throw InvalidDataException.createWithFieldAndErrorCode(Field.CITY, ErrorCode.NOT_FOUND);
 		}
 		venue.setCity(city);
 	}

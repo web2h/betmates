@@ -15,8 +15,8 @@ import com.google.common.base.Preconditions;
 import com.web2h.betmates.restapp.core.service.competition.helper.AddedAndRemovedTeams;
 import com.web2h.betmates.restapp.core.service.competition.helper.AddedAndRemovedVenues;
 import com.web2h.betmates.restapp.model.entity.competition.Competition;
+import com.web2h.betmates.restapp.model.entity.competition.CompetitionTeam;
 import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEvent;
-import com.web2h.betmates.restapp.model.entity.reference.Team;
 import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
@@ -170,20 +170,20 @@ public class CompetitionServiceImpl implements CompetitionService {
 		AddedAndRemovedTeams addedAndRemovedTeams = new AddedAndRemovedTeams();
 
 		// Teams removed from the competition
-		Iterator<Team> currentTeamsIterator = currentCompetition.getTeams().iterator();
+		Iterator<CompetitionTeam> currentTeamsIterator = currentCompetition.getTeams().iterator();
 		while (currentTeamsIterator.hasNext()) {
-			Team currentTeam = currentTeamsIterator.next();
+			CompetitionTeam currentTeam = currentTeamsIterator.next();
 			if (!newCompetition.getTeams().contains(currentTeam)) {
-				logger.info("The team " + currentTeam.getLogValue() + " has been removed from the competition " + currentCompetition.getLogValue());
+				logger.info("The team " + currentTeam.getTeam().getLogValue() + " has been removed from the competition " + currentCompetition.getLogValue());
 				currentTeamsIterator.remove();
 				addedAndRemovedTeams.getRemovedTeams().add(currentTeam);
 			}
 		}
 
 		// New teams to add
-		for (Team newTeam : newCompetition.getTeams()) {
+		for (CompetitionTeam newTeam : newCompetition.getTeams()) {
 			if (!currentCompetition.getTeams().contains(newTeam)) {
-				logger.info("The team " + newTeam.getLogValue() + " has been added to the competition " + currentCompetition.getLogValue());
+				logger.info("The team " + newTeam.getTeam().getLogValue() + " has been added to the competition " + currentCompetition.getLogValue());
 				currentCompetition.getTeams().add(newTeam);
 				addedAndRemovedTeams.getAddedTeams().add(newTeam);
 			}
@@ -218,15 +218,15 @@ public class CompetitionServiceImpl implements CompetitionService {
 		return addedAndRemovedVenues;
 	}
 
-	private void checkIfTeamsExist(Set<Team> teams) throws InvalidDataException {
+	private void checkIfTeamsExist(Set<CompetitionTeam> teams) throws InvalidDataException {
 		if (teams == null || teams.isEmpty()) {
 			return;
 		}
-		Set<Team> notFoundVenues = teams.stream()
-				.filter(venue -> teamRepository.findOne(venue.getId()) == null)
+		Set<CompetitionTeam> notFoundTeams = teams.stream()
+				.filter(team -> teamRepository.findOne(team.getTeam().getId()) == null)
 				.collect(Collectors.toSet());
-		if (!notFoundVenues.isEmpty()) {
-			throw new InvalidDataException(notFoundVenues, Field.TEAM);
+		if (!notFoundTeams.isEmpty()) {
+			throw InvalidDataException.createWithUnfoundTeams(notFoundTeams);
 		}
 	}
 
@@ -238,7 +238,7 @@ public class CompetitionServiceImpl implements CompetitionService {
 				.filter(venue -> venueRepository.findOne(venue.getId()) == null)
 				.collect(Collectors.toSet());
 		if (!notFoundVenues.isEmpty()) {
-			throw new InvalidDataException(notFoundVenues, Field.VENUE);
+			throw InvalidDataException.createWithUnfoundVenues(notFoundVenues);
 		}
 	}
 }

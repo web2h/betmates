@@ -11,6 +11,8 @@ public interface FieldLength {
 
 	int EMAIL_MAX_LENGTH = 128;
 
+	int GROUP_MAX_LENGTH = 32;
+
 	int NAME_MAX_LENGTH = 64;
 
 	int PASSWORD_MAX_LENGTH = 128;

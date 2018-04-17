@@ -121,7 +121,7 @@ public class VenueControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithUnknownCity_ShouldReturnBadRequest() throws Exception {
 		Venue venue = createValidVenueForCreation();
-		given(venueService.create(anyObject(), anyObject())).willThrow(new InvalidDataException(Field.CITY, ErrorCode.NOT_FOUND));
+		given(venueService.create(anyObject(), anyObject())).willThrow(InvalidDataException.createWithFieldAndErrorCode(Field.CITY, ErrorCode.NOT_FOUND));
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
 		actions.andExpect(status().isBadRequest());
@@ -225,7 +225,7 @@ public class VenueControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithUnknownCity_ShouldReturnBadRequest() throws Exception {
 		Venue venue = createValidVenueForEdition();
-		given(venueService.edit(anyObject(), anyObject())).willThrow(new InvalidDataException(Field.CITY, ErrorCode.NOT_FOUND));
+		given(venueService.edit(anyObject(), anyObject())).willThrow(InvalidDataException.createWithFieldAndErrorCode(Field.CITY, ErrorCode.NOT_FOUND));
 
 		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
 		actions.andExpect(status().isBadRequest());

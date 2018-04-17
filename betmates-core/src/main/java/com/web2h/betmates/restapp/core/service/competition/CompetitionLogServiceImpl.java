@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import com.web2h.betmates.restapp.core.service.competition.helper.AddedAndRemovedTeams;
 import com.web2h.betmates.restapp.core.service.competition.helper.AddedAndRemovedVenues;
 import com.web2h.betmates.restapp.model.entity.competition.Competition;
+import com.web2h.betmates.restapp.model.entity.competition.CompetitionTeam;
 import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEvent;
 import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEventChange;
 import com.web2h.betmates.restapp.model.entity.log.LogEventType;
-import com.web2h.betmates.restapp.model.entity.reference.Team;
 import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.validation.Field;
@@ -70,15 +70,17 @@ public class CompetitionLogServiceImpl implements CompetitionLogService {
 
 	@Override
 	public void logTeamAdditionOrRemoval(Competition competition, AddedAndRemovedTeams addedAndRemovedTeams, AppUser editor) {
-		for (Team removedTeam : addedAndRemovedTeams.getRemovedTeams()) {
+		for (CompetitionTeam removedTeam : addedAndRemovedTeams.getRemovedTeams()) {
 			CompetitionLogEvent event = new CompetitionLogEvent(competition, LogEventType.TEAM_REMOVAL, editor);
-			event.setDescription("Team " + removedTeam.getLogValue() + " has been removed");
+			event.setDescription("Team " + removedTeam.getTeam().getLogValue() + " has been removed");
 			competitionLogEventRepository.save(event);
 		}
 
-		for (Team addedTeam : addedAndRemovedTeams.getAddedTeams()) {
+		for (CompetitionTeam addedTeam : addedAndRemovedTeams.getAddedTeams()) {
 			CompetitionLogEvent event = new CompetitionLogEvent(competition, LogEventType.TEAM_ADDITION, editor);
-			event.setDescription("Team " + addedTeam.getLogValue() + " has been added");
+			event.setDescription("Team " + addedTeam.getTeam().getLogValue() + " has been added");
+			// TODO add other info (group + position)
+
 			competitionLogEventRepository.save(event);
 		}
 	}

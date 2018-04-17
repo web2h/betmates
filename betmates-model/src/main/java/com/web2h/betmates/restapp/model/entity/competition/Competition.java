@@ -19,6 +19,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
@@ -39,7 +40,7 @@ import com.web2h.tools.StringTools;
 import com.web2h.tools.validation.SameDayOrFuture;
 
 /**
- * Competition user entity class.
+ * Competition entity class.
  * 
  * @author web2h
  */
@@ -81,14 +82,29 @@ public class Competition {
 	private Date startDate;
 
 	/** TEAMS - Teams playing in that competition. */
-	@ManyToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "competition_teams", joinColumns = @JoinColumn(name = "competition_id"), inverseJoinColumns = @JoinColumn(name = "team_id"))
-	private Set<Team> teams = new HashSet<>();
+	@OneToMany(mappedBy = "competition", cascade = CascadeType.ALL)
+	private Set<CompetitionTeam> teams = new HashSet<>();
 
 	/** VENUES - Venues where games will be held for that competition. */
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "competition_venues", joinColumns = @JoinColumn(name = "competition_id"), inverseJoinColumns = @JoinColumn(name = "venue_id"))
 	private Set<Venue> venues = new HashSet<>();
+
+	public void addTeam(Team team, CompetitionGroup group, int position) {
+		CompetitionTeam competitionTeam = new CompetitionTeam();
+		competitionTeam.setCompetition(this);
+		competitionTeam.setTeam(team);
+		competitionTeam.setGroup(group);
+		competitionTeam.setPosition(position);
+		teams.add(competitionTeam);
+	}
+
+	public void removeTeam(Team team) {
+		CompetitionTeam competitionTeam = new CompetitionTeam();
+		competitionTeam.setCompetition(this);
+		competitionTeam.setTeam(team);
+		teams.remove(competitionTeam);
+	}
 
 	@Override
 	public int hashCode() {
@@ -181,7 +197,7 @@ public class Competition {
 		this.startDate = startDate;
 	}
 
-	public Set<Team> getTeams() {
+	public Set<CompetitionTeam> getTeams() {
 		return teams;
 	}
 

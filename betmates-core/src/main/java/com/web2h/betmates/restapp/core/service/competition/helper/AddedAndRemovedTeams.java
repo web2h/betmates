@@ -3,24 +3,24 @@ package com.web2h.betmates.restapp.core.service.competition.helper;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.web2h.betmates.restapp.model.entity.reference.Team;
+import com.web2h.betmates.restapp.model.entity.competition.CompetitionTeam;
 
 public class AddedAndRemovedTeams {
 
-	private Set<Team> addedTeams;
+	private Set<CompetitionTeam> addedTeams;
 
-	private Set<Team> removedTeams;
+	private Set<CompetitionTeam> removedTeams;
 
 	public AddedAndRemovedTeams() {
 		addedTeams = new HashSet<>();
 		removedTeams = new HashSet<>();
 	}
 
-	public Set<Team> getAddedTeams() {
+	public Set<CompetitionTeam> getAddedTeams() {
 		return addedTeams;
 	}
 
-	public Set<Team> getRemovedTeams() {
+	public Set<CompetitionTeam> getRemovedTeams() {
 		return removedTeams;
 	}
 }

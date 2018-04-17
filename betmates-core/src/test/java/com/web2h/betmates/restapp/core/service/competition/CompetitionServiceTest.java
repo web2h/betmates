@@ -23,11 +23,12 @@ import com.web2h.betmates.restapp.core.service.CommonTest;
 import com.web2h.betmates.restapp.core.service.reference.TeamService;
 import com.web2h.betmates.restapp.core.service.reference.VenueService;
 import com.web2h.betmates.restapp.model.entity.competition.Competition;
+import com.web2h.betmates.restapp.model.entity.competition.CompetitionGroup;
+import com.web2h.betmates.restapp.model.entity.competition.CompetitionTeam;
 import com.web2h.betmates.restapp.model.entity.competition.CompetitionType;
 import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEvent;
 import com.web2h.betmates.restapp.model.entity.competition.log.CompetitionLogEventChange;
 import com.web2h.betmates.restapp.model.entity.log.LogEventType;
-import com.web2h.betmates.restapp.model.entity.reference.Team;
 import com.web2h.betmates.restapp.model.entity.reference.Venue;
 import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
@@ -96,8 +97,8 @@ public class CompetitionServiceTest extends CommonTest {
 	@Test
 	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
 	public void addOrRemoveTeams_WithUnknownTeam_ThrowInvalidDataException() throws Exception {
-		nbaPlayoffs2018.getTeams().add(teamService.get(chicagoBulls.getId()));
-		nbaPlayoffs2018.getTeams().add(unknownTeam);
+		nbaPlayoffs2018.addTeam(teamService.get(chicagoBulls.getId()), CompetitionGroup.EAST, 4);
+		nbaPlayoffs2018.addTeam(unknownTeam, CompetitionGroup.EAST, 2);
 
 		try {
 			sut.addOrRemoveTeams(nbaPlayoffs2018, admin);
@@ -111,8 +112,8 @@ public class CompetitionServiceTest extends CommonTest {
 	@Test
 	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
 	public void addOrRemoveTeams_AddTeams_TeamsAreAdded() throws Exception {
-		nbaPlayoffs2018.getTeams().add(teamService.get(chicagoBulls.getId()));
-		nbaPlayoffs2018.getTeams().add(teamService.get(orlandoMagic.getId()));
+		nbaPlayoffs2018.addTeam(teamService.get(chicagoBulls.getId()), CompetitionGroup.EAST, 8);
+		nbaPlayoffs2018.addTeam(teamService.get(orlandoMagic.getId()), CompetitionGroup.EAST, 7);
 
 		sut.addOrRemoveTeams(nbaPlayoffs2018, admin);
 
@@ -124,14 +125,14 @@ public class CompetitionServiceTest extends CommonTest {
 		boolean bostonIsHere = false;
 		boolean orlandoIsHere = false;
 
-		for (Team team : editedCompetition.getTeams()) {
-			if (bostonCeltics.equals(team)) {
+		for (CompetitionTeam team : editedCompetition.getTeams()) {
+			if (bostonCeltics.equals(team.getTeam())) {
 				bostonIsHere = true;
-			} else if (miamiHeat.equals(team)) {
+			} else if (miamiHeat.equals(team.getTeam())) {
 				miamiIsHere = true;
-			} else if (chicagoBulls.equals(team)) {
+			} else if (chicagoBulls.equals(team.getTeam())) {
 				chicagoIsHere = true;
-			} else if (orlandoMagic.equals(team)) {
+			} else if (orlandoMagic.equals(team.getTeam())) {
 				orlandoIsHere = true;
 			}
 		}
@@ -160,7 +161,7 @@ public class CompetitionServiceTest extends CommonTest {
 	@Test
 	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
 	public void addOrRemoveTeams_RemoveTeam_TeamIsRemoved() throws Exception {
-		nbaPlayoffs2018.getTeams().remove(bostonCeltics);
+		nbaPlayoffs2018.removeTeam(bostonCeltics);
 
 		sut.addOrRemoveTeams(nbaPlayoffs2018, admin);
 
@@ -170,10 +171,10 @@ public class CompetitionServiceTest extends CommonTest {
 		boolean miamiIsHere = false;
 		boolean bostonIsNotHere = true;
 
-		for (Team team : editedCompetition.getTeams()) {
-			if (bostonCeltics.equals(team)) {
+		for (CompetitionTeam team : editedCompetition.getTeams()) {
+			if (bostonCeltics.equals(team.getTeam())) {
 				bostonIsNotHere = false;
-			} else if (miamiHeat.equals(team)) {
+			} else if (miamiHeat.equals(team.getTeam())) {
 				miamiIsHere = true;
 			}
 		}
@@ -191,8 +192,8 @@ public class CompetitionServiceTest extends CommonTest {
 	@Test
 	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")
 	public void addOrRemoveTeams_AddTeamAndRemoveTeam_TeamsAreUpdated() throws Exception {
-		nbaPlayoffs2018.getTeams().remove(bostonCeltics);
-		nbaPlayoffs2018.getTeams().add(teamService.get(chicagoBulls.getId()));
+		nbaPlayoffs2018.removeTeam(bostonCeltics);
+		nbaPlayoffs2018.addTeam(teamService.get(chicagoBulls.getId()), CompetitionGroup.EAST, 7);
 
 		sut.addOrRemoveTeams(nbaPlayoffs2018, admin);
 
@@ -203,12 +204,12 @@ public class CompetitionServiceTest extends CommonTest {
 		boolean chicagoIsHere = false;
 		boolean bostonIsNotHere = true;
 
-		for (Team team : editedCompetition.getTeams()) {
-			if (bostonCeltics.equals(team)) {
+		for (CompetitionTeam team : editedCompetition.getTeams()) {
+			if (bostonCeltics.equals(team.getTeam())) {
 				bostonIsNotHere = false;
-			} else if (miamiHeat.equals(team)) {
+			} else if (miamiHeat.equals(team.getTeam())) {
 				miamiIsHere = true;
-			} else if (chicagoBulls.equals(team)) {
+			} else if (chicagoBulls.equals(team.getTeam())) {
 				chicagoIsHere = true;
 			}
 		}

@@ -52,7 +52,7 @@ public class CompetitionController extends CommonController {
 	public ResponseEntity<Object> addOrRemoveTeams(@RequestBody @Validated(EditionChecks.class) Competition competition, BindingResult result) {
 		logger.info("Team addition or removal for " + competition);
 		if (result.hasErrors()) {
-			InvalidDataException ide = new InvalidDataException(result.getAllErrors());
+			InvalidDataException ide = InvalidDataException.createWithErrorList(result.getAllErrors());
 			logger.warn("Invalid data");
 			return ide.getResponseEntity();
 		}
@@ -78,7 +78,7 @@ public class CompetitionController extends CommonController {
 	public ResponseEntity<Object> addOrRemoveVenues(@RequestBody @Validated(EditionChecks.class) Competition competition, BindingResult result) {
 		logger.info("Venue addition or removal for " + competition);
 		if (result.hasErrors()) {
-			InvalidDataException ide = new InvalidDataException(result.getAllErrors());
+			InvalidDataException ide = InvalidDataException.createWithErrorList(result.getAllErrors());
 			logger.warn("Invalid data");
 			return ide.getResponseEntity();
 		}
@@ -104,7 +104,7 @@ public class CompetitionController extends CommonController {
 	public ResponseEntity<Object> create(@RequestBody @Validated(CreationChecks.class) Competition competition, BindingResult result) {
 		logger.info("Competition creation" + competition);
 		if (result.hasErrors()) {
-			InvalidDataException ide = new InvalidDataException(result.getAllErrors());
+			InvalidDataException ide = InvalidDataException.createWithErrorList(result.getAllErrors());
 			logger.warn("Invalid data");
 			return ide.getResponseEntity();
 		}
@@ -127,7 +127,7 @@ public class CompetitionController extends CommonController {
 	public ResponseEntity<Object> edit(@RequestBody @Validated(EditionChecks.class) Competition competition, BindingResult result) {
 		logger.info("Competition edition" + competition);
 		if (result.hasErrors()) {
-			InvalidDataException ide = new InvalidDataException(result.getAllErrors());
+			InvalidDataException ide = InvalidDataException.createWithErrorList(result.getAllErrors());
 			logger.warn("Invalid data");
 			return ide.getResponseEntity();
 		}

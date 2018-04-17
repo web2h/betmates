@@ -53,7 +53,7 @@ public class CityServiceImpl extends ReferenceServiceImpl<City> implements CityS
 		Country country = countryRepository.findOne(city.getCountry().getId());
 		if (country == null) {
 			logger.warn("No country exists with the given ID [" + city.getCountry().getId() + "]");
-			throw new InvalidDataException(Field.COUNTRY, ErrorCode.NOT_FOUND);
+			throw InvalidDataException.createWithFieldAndErrorCode(Field.COUNTRY, ErrorCode.NOT_FOUND);
 		}
 		city.setCountry(country);
 	}
