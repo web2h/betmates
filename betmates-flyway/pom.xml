@@ -20,12 +20,10 @@
 		<plugins>
 			<plugin>
 				<groupId>org.flywaydb</groupId>
-				<artifactId>flyway-maven-plugin</artifactId>
-				<version>${org.flywaydb.version}</version>
-				
+				<artifactId>flyway-maven-plugin</artifactId>				
 				<configuration>
-                    			<configFile>src/main/resources/flyway.properties</configFile>
-                		</configuration>
+					<configFile>src/main/resources/flyway.properties</configFile>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

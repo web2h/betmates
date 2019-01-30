@@ -1,6 +1,7 @@
 package com.web2h.betmates.restapp.core.service.reference;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.google.common.base.Preconditions;
 import com.web2h.betmates.restapp.model.entity.reference.Reference;
@@ -44,24 +45,21 @@ public abstract class ReferenceServiceImpl<R extends Reference> implements Refer
 		Preconditions.checkNotNull(reference);
 		Preconditions.checkNotNull(editor);
 
-		R existingReference = getRepository().findOne(reference.getId());
-		if (existingReference == null) {
-			throw new NotFoundException(Field.ID, reference.getClass().getName());
-		}
-
+		Optional<R> existingReference = getRepository().findById(reference.getId());
+		existingReference.orElseThrow(() -> new NotFoundException(Field.ID, reference.getClass().getName()));
 		checkIfLinkedReferenceExists(reference);
 		checkIfExists(reference);
 
-		referenceLogService.logEdition(existingReference, reference, editor);
+		referenceLogService.logEdition(existingReference.get(), reference, editor);
 
-		merge(existingReference, reference);
-		getRepository().save(existingReference);
-		return existingReference;
+		merge(existingReference.get(), reference);
+		getRepository().save(existingReference.get());
+		return existingReference.get();
 	}
 
 	@Override
 	public R get(Long referenceId) {
-		return getRepository().findOne(referenceId);
+		return getRepository().findById(referenceId).get();
 	}
 
 	@Override

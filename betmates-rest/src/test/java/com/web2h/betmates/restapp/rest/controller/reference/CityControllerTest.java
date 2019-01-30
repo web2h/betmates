@@ -7,7 +7,7 @@ import static com.web2h.betmates.restapp.rest.controller.UrlConstants.CITY_EDITI
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -32,6 +32,7 @@ import com.web2h.betmates.restapp.core.service.reference.CityService;
 import com.web2h.betmates.restapp.model.entity.FieldLength;
 import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
+import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
 import com.web2h.betmates.restapp.model.exception.NotFoundException;
@@ -57,7 +58,7 @@ public class CityControllerTest extends CommonControllerTest {
 
 	@Before
 	public void before() throws Exception {
-		given(cityService.create(anyObject(), anyObject())).willReturn(null);
+		given(cityService.create(any(City.class), any(AppUser.class))).willReturn(null);
 		doReturn(null).when(cityController).getLoggedInUser();
 	}
 
@@ -66,7 +67,7 @@ public class CityControllerTest extends CommonControllerTest {
 		City city = createValidCityForCreation();
 		String jsonCity = asJsonString(city);
 		city.setId(1l);
-		given(cityService.create(anyObject(), anyObject())).willReturn(city);
+		given(cityService.create(any(City.class), any(AppUser.class))).willReturn(city);
 
 		ResultActions actions = mockMvc.perform(post(CITY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCity));
 		actions.andExpect(status().isOk());
@@ -84,7 +85,7 @@ public class CityControllerTest extends CommonControllerTest {
 		city.setId(1l);
 		city.setNameEn(nameEn);
 		city.setNameFr(nameFr);
-		given(cityService.create(anyObject(), anyObject())).willReturn(city);
+		given(cityService.create(any(City.class), any(AppUser.class))).willReturn(city);
 
 		ResultActions actions = mockMvc.perform(post(CITY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCity));
 		actions.andExpect(status().isOk());
@@ -94,7 +95,7 @@ public class CityControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithExistingEnglishName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForCreation();
-		given(cityService.create(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_EN, City.class.getName()));
+		given(cityService.create(any(City.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_EN, City.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(CITY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
 		actions.andExpect(status().isBadRequest());
@@ -107,7 +108,7 @@ public class CityControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithExistingFrenchName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForCreation();
-		given(cityService.create(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_FR, City.class.getName()));
+		given(cityService.create(any(City.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_FR, City.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(CITY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
 		actions.andExpect(status().isBadRequest());
@@ -120,7 +121,7 @@ public class CityControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithUnknownCountry_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForCreation();
-		given(cityService.create(anyObject(), anyObject())).willThrow(InvalidDataException.createWithFieldAndErrorCode(Field.COUNTRY, ErrorCode.NOT_FOUND));
+		given(cityService.create(any(City.class), any(AppUser.class))).willThrow(InvalidDataException.createWithFieldAndErrorCode(Field.COUNTRY, ErrorCode.NOT_FOUND));
 
 		ResultActions actions = mockMvc.perform(post(CITY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
 		actions.andExpect(status().isBadRequest());
@@ -133,7 +134,7 @@ public class CityControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithServerException_ShouldReturnInternalServerError() throws Exception {
 		City city = createValidCityForCreation();
-		given(cityService.create(anyObject(), anyObject())).willThrow(new RuntimeException("Message"));
+		given(cityService.create(any(City.class), any(AppUser.class))).willThrow(new RuntimeException("Message"));
 
 		ResultActions actions = mockMvc.perform(post(CITY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
 		actions.andExpect(status().isInternalServerError());
@@ -200,7 +201,7 @@ public class CityControllerTest extends CommonControllerTest {
 	public void edit_WithValidCity_ShouldReturnOk() throws Exception {
 		City city = createValidCityForEdition();
 		String jsonCity = asJsonString(city);
-		given(cityService.edit(anyObject(), anyObject())).willReturn(city);
+		given(cityService.edit(any(City.class), any(AppUser.class))).willReturn(city);
 
 		ResultActions actions = mockMvc.perform(put(CITY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCity));
 		actions.andExpect(status().isOk());
@@ -211,7 +212,7 @@ public class CityControllerTest extends CommonControllerTest {
 	public void edit_UnknownCity_ShouldReturnNotFound() throws Exception {
 		City city = createValidCityForEdition();
 		String jsonCity = asJsonString(city);
-		given(cityService.edit(anyObject(), anyObject())).willThrow(new NotFoundException(Field.ID, City.class.getName()));
+		given(cityService.edit(any(City.class), any(AppUser.class))).willThrow(new NotFoundException(Field.ID, City.class.getName()));
 
 		ResultActions actions = mockMvc.perform(put(CITY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCity));
 		actions.andExpect(status().isNotFound());
@@ -224,7 +225,7 @@ public class CityControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithUnknownCountry_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForEdition();
-		given(cityService.edit(anyObject(), anyObject())).willThrow(InvalidDataException.createWithFieldAndErrorCode(Field.COUNTRY, ErrorCode.NOT_FOUND));
+		given(cityService.edit(any(City.class), any(AppUser.class))).willThrow(InvalidDataException.createWithFieldAndErrorCode(Field.COUNTRY, ErrorCode.NOT_FOUND));
 
 		ResultActions actions = mockMvc.perform(put(CITY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
 		actions.andExpect(status().isBadRequest());
@@ -237,7 +238,7 @@ public class CityControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithExistingEnglishName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForEdition();
-		given(cityService.edit(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_EN, City.class.getName()));
+		given(cityService.edit(any(City.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_EN, City.class.getName()));
 
 		ResultActions actions = mockMvc.perform(put(CITY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
 		actions.andExpect(status().isBadRequest());
@@ -250,7 +251,7 @@ public class CityControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithExistingFrenchName_ShouldReturnBadRequest() throws Exception {
 		City city = createValidCityForEdition();
-		given(cityService.edit(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_FR, City.class.getName()));
+		given(cityService.edit(any(City.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_FR, City.class.getName()));
 
 		ResultActions actions = mockMvc.perform(put(CITY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
 		actions.andExpect(status().isBadRequest());
@@ -263,7 +264,7 @@ public class CityControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithServerException_ShouldReturnInternalServerError() throws Exception {
 		City city = createValidCityForEdition();
-		given(cityService.edit(anyObject(), anyObject())).willThrow(new RuntimeException("Message"));
+		given(cityService.edit(any(City.class), any(AppUser.class))).willThrow(new RuntimeException("Message"));
 
 		ResultActions actions = mockMvc.perform(put(CITY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(city)));
 		actions.andExpect(status().isInternalServerError());

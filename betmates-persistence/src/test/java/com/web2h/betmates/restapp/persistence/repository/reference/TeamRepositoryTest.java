@@ -12,17 +12,12 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.web2h.betmates.restapp.persistence.repository.user.AppUserRepository;
-
 @RunWith(SpringRunner.class)
 @DataJpaTest
 public class TeamRepositoryTest {
 
 	@Autowired
 	private TeamRepository sut;
-
-	@Autowired
-	private AppUserRepository appUserRepository;
 
 	@Test
 	@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:test-dataset/data.sql")

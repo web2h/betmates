@@ -4,7 +4,7 @@ import static com.web2h.betmates.restapp.rest.controller.UrlConstants.SIGN_UP_UR
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,7 +43,7 @@ public class UserControllerTest extends CommonControllerTest {
 		String jsonUser = asJsonString(appUser);
 		appUser.setId(1l);
 
-		given(userService.signUpAppUser(anyObject())).willReturn(appUser);
+		given(userService.signUpAppUser(any(AppUser.class))).willReturn(appUser);
 
 		ResultActions actions = mockMvc.perform(post(SIGN_UP_URL).contentType(MediaType.APPLICATION_JSON).content(jsonUser));
 		actions.andExpect(status().isOk());
@@ -63,7 +63,7 @@ public class UserControllerTest extends CommonControllerTest {
 		appUser.setId(1l);
 		appUser.setEmail(email);
 		appUser.setAlias(alias);
-		given(userService.signUpAppUser(anyObject())).willReturn(appUser);
+		given(userService.signUpAppUser(any(AppUser.class))).willReturn(appUser);
 
 		ResultActions actions = mockMvc.perform(post(SIGN_UP_URL).contentType(MediaType.APPLICATION_JSON).content(jsonUser));
 
@@ -74,7 +74,7 @@ public class UserControllerTest extends CommonControllerTest {
 	@Test
 	public void signUp_WithExistingUserEmail_ShouldReturnBadRequest() throws Exception {
 		AppUser appUser = createValidAppUser();
-		given(userService.signUpAppUser(anyObject())).willThrow(new AlreadyExistsException(Field.EMAIL));
+		given(userService.signUpAppUser(any(AppUser.class))).willThrow(new AlreadyExistsException(Field.EMAIL));
 
 		ResultActions actions = mockMvc.perform(post(SIGN_UP_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(appUser)));
 		actions.andExpect(status().isBadRequest());
@@ -87,7 +87,7 @@ public class UserControllerTest extends CommonControllerTest {
 	@Test
 	public void signUp_WithExistingUserAlias_ShouldReturnBadRequest() throws Exception {
 		AppUser appUser = createValidAppUser();
-		given(userService.signUpAppUser(anyObject())).willThrow(new AlreadyExistsException(Field.ALIAS));
+		given(userService.signUpAppUser(any(AppUser.class))).willThrow(new AlreadyExistsException(Field.ALIAS));
 
 		ResultActions actions = mockMvc.perform(post(SIGN_UP_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(appUser)));
 		actions.andExpect(status().isBadRequest());
@@ -100,7 +100,7 @@ public class UserControllerTest extends CommonControllerTest {
 	@Test
 	public void signUp_WithServerException_ShouldReturnInternalServerError() throws Exception {
 		AppUser appUser = createValidAppUser();
-		given(userService.signUpAppUser(anyObject())).willThrow(new RuntimeException("Message"));
+		given(userService.signUpAppUser(any(AppUser.class))).willThrow(new RuntimeException("Message"));
 
 		ResultActions actions = mockMvc.perform(post(SIGN_UP_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(appUser)));
 		actions.andExpect(status().isInternalServerError());

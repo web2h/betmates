@@ -54,7 +54,7 @@ public class CommonTest {
 
 	@Before
 	public void before() {
-		admin = appUserRepository.findOne(1l);
+		admin = appUserRepository.findById(1l).get();
 
 		createCountries();
 		createCities();

@@ -1,7 +1,7 @@
 package com.web2h.betmates.restapp.core.service.reference;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,8 +28,6 @@ public class CityServiceImpl extends ReferenceServiceImpl<City> implements CityS
 
 	private CountryRepository countryRepository;
 
-	private Logger logger = LoggerFactory.getLogger(CityServiceImpl.class);
-
 	public CityServiceImpl(CityRepository cityRepository, CountryRepository countryRepository, ReferenceLogService referenceLogService) {
 		super(referenceLogService);
 		this.cityRepository = cityRepository;
@@ -50,12 +48,10 @@ public class CityServiceImpl extends ReferenceServiceImpl<City> implements CityS
 
 	@Override
 	public void checkIfLinkedReferenceExists(City city) throws InvalidDataException {
-		Country country = countryRepository.findOne(city.getCountry().getId());
-		if (country == null) {
-			logger.warn("No country exists with the given ID [" + city.getCountry().getId() + "]");
-			throw InvalidDataException.createWithFieldAndErrorCode(Field.COUNTRY, ErrorCode.NOT_FOUND);
-		}
-		city.setCountry(country);
+		
+		Optional<Country> country = countryRepository.findById(city.getCountry().getId());
+		country.orElseThrow(() -> InvalidDataException.createWithFieldAndErrorCode(Field.COUNTRY, ErrorCode.NOT_FOUND));
+		city.setCountry(country.get());
 	}
 
 	@Override
@@ -67,8 +63,8 @@ public class CityServiceImpl extends ReferenceServiceImpl<City> implements CityS
 	public void merge(City existingCity, City newCity) {
 		super.merge(existingCity, newCity);
 		if (!existingCity.getCountry().equals(newCity.getCountry())) {
-			Country newCountry = countryRepository.findOne(newCity.getCountry().getId());
-			existingCity.setCountry(newCountry);
+			Optional<Country> newCountry = countryRepository.findById(newCity.getCountry().getId());
+			existingCity.setCountry(newCountry.get());
 		}
 	}
 }

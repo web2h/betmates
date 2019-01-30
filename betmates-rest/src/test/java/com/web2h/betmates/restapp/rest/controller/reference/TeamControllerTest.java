@@ -8,7 +8,7 @@ import static com.web2h.betmates.restapp.rest.controller.UrlConstants.TEAM_EDITI
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -32,6 +32,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.web2h.betmates.restapp.core.service.reference.TeamService;
 import com.web2h.betmates.restapp.model.entity.reference.Sport;
 import com.web2h.betmates.restapp.model.entity.reference.Team;
+import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.NotFoundException;
 import com.web2h.betmates.restapp.model.validation.ErrorCode;
@@ -56,7 +57,7 @@ public class TeamControllerTest extends CommonControllerTest {
 
 	@Before
 	public void before() throws Exception {
-		given(teamService.create(anyObject(), anyObject())).willReturn(null);
+		given(teamService.create(any(Team.class), any(AppUser.class))).willReturn(null);
 		doReturn(null).when(teamController).getLoggedInUser();
 	}
 
@@ -65,7 +66,7 @@ public class TeamControllerTest extends CommonControllerTest {
 		Team team = createValidTeamForCreation();
 		String jsonTeam = asJsonString(team);
 		team.setId(1l);
-		given(teamService.create(anyObject(), anyObject())).willReturn(team);
+		given(teamService.create(any(Team.class), any(AppUser.class))).willReturn(team);
 
 		ResultActions actions = mockMvc.perform(post(TEAM_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonTeam));
 		actions.andExpect(status().isOk());
@@ -90,7 +91,7 @@ public class TeamControllerTest extends CommonControllerTest {
 		team.setNameFr(nameFr);
 		team.setShortNameEn(shortNameEn);
 		team.setShortNameFr(shortNameFr);
-		given(teamService.create(anyObject(), anyObject())).willReturn(team);
+		given(teamService.create(any(Team.class), any(AppUser.class))).willReturn(team);
 
 		ResultActions actions = mockMvc.perform(post(TEAM_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonTeam));
 		actions.andExpect(status().isOk());
@@ -100,7 +101,7 @@ public class TeamControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithExistingEnglishName_ShouldReturnBadRequest() throws Exception {
 		Team team = createValidTeamForCreation();
-		given(teamService.create(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_EN, Team.class.getName()));
+		given(teamService.create(any(Team.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_EN, Team.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(TEAM_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(team)));
 		actions.andExpect(status().isBadRequest());
@@ -113,7 +114,7 @@ public class TeamControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithExistingFrenchName_ShouldReturnBadRequest() throws Exception {
 		Team team = createValidTeamForCreation();
-		given(teamService.create(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_FR, Team.class.getName()));
+		given(teamService.create(any(Team.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_FR, Team.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(TEAM_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(team)));
 		actions.andExpect(status().isBadRequest());
@@ -126,7 +127,7 @@ public class TeamControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithServerException_ShouldReturnInternalServerError() throws Exception {
 		Team team = createValidTeamForCreation();
-		given(teamService.create(anyObject(), anyObject())).willThrow(new RuntimeException("Message"));
+		given(teamService.create(any(Team.class), any(AppUser.class))).willThrow(new RuntimeException("Message"));
 
 		ResultActions actions = mockMvc.perform(post(TEAM_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(team)));
 		actions.andExpect(status().isInternalServerError());
@@ -235,7 +236,7 @@ public class TeamControllerTest extends CommonControllerTest {
 	public void edit_WithValidTeam_ShouldReturnOk() throws Exception {
 		Team team = createValidTeamForEdition();
 		String jsonTeam = asJsonString(team);
-		given(teamService.edit(anyObject(), anyObject())).willReturn(team);
+		given(teamService.edit(any(Team.class), any(AppUser.class))).willReturn(team);
 
 		ResultActions actions = mockMvc.perform(put(TEAM_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonTeam));
 		actions.andExpect(status().isOk());
@@ -246,7 +247,7 @@ public class TeamControllerTest extends CommonControllerTest {
 	public void edit_UnknownTeam_ShouldReturnNotFound() throws Exception {
 		Team team = createValidTeamForEdition();
 		String jsonTeam = asJsonString(team);
-		given(teamService.edit(anyObject(), anyObject())).willThrow(new NotFoundException(Field.ID, Team.class.getName()));
+		given(teamService.edit(any(Team.class), any(AppUser.class))).willThrow(new NotFoundException(Field.ID, Team.class.getName()));
 
 		ResultActions actions = mockMvc.perform(put(TEAM_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonTeam));
 		actions.andExpect(status().isNotFound());
@@ -259,7 +260,7 @@ public class TeamControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithExistingEnglishName_ShouldReturnBadRequest() throws Exception {
 		Team team = createValidTeamForEdition();
-		given(teamService.edit(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_EN, Team.class.getName()));
+		given(teamService.edit(any(Team.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_EN, Team.class.getName()));
 
 		ResultActions actions = mockMvc.perform(put(TEAM_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(team)));
 		actions.andExpect(status().isBadRequest());
@@ -272,7 +273,7 @@ public class TeamControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithExistingFrenchName_ShouldReturnBadRequest() throws Exception {
 		Team team = createValidTeamForEdition();
-		given(teamService.edit(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_FR, Team.class.getName()));
+		given(teamService.edit(any(Team.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_FR, Team.class.getName()));
 
 		ResultActions actions = mockMvc.perform(put(TEAM_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(team)));
 		actions.andExpect(status().isBadRequest());
@@ -285,7 +286,7 @@ public class TeamControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithServerException_ShouldReturnInternalServerError() throws Exception {
 		Team team = createValidTeamForEdition();
-		given(teamService.edit(anyObject(), anyObject())).willThrow(new RuntimeException("Message"));
+		given(teamService.edit(any(Team.class), any(AppUser.class))).willThrow(new RuntimeException("Message"));
 
 		ResultActions actions = mockMvc.perform(put(TEAM_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(team)));
 		actions.andExpect(status().isInternalServerError());

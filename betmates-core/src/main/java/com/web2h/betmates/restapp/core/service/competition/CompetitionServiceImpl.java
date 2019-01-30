@@ -2,6 +2,7 @@ package com.web2h.betmates.restapp.core.service.competition;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -116,7 +117,7 @@ public class CompetitionServiceImpl implements CompetitionService {
 
 	@Override
 	public Competition get(Long competitionId) {
-		return competitionRepository.findOne(competitionId);
+		return competitionRepository.findById(competitionId).get();
 	}
 
 	@Override
@@ -125,11 +126,9 @@ public class CompetitionServiceImpl implements CompetitionService {
 	}
 
 	private Competition checkIfCompetitionExists(Competition competition) throws NotFoundException {
-		Competition currentCompetition = competitionRepository.findOne(competition.getId());
-		if (currentCompetition == null) {
-			throw new NotFoundException(Field.ID, Competition.class.getName());
-		}
-		return currentCompetition;
+		Optional<Competition> currentCompetition = competitionRepository.findById(competition.getId());
+		currentCompetition.orElseThrow(() -> new NotFoundException(Field.ID, Competition.class.getName()));
+		return currentCompetition.get();
 	}
 
 	/**
@@ -223,7 +222,7 @@ public class CompetitionServiceImpl implements CompetitionService {
 			return;
 		}
 		Set<CompetitionTeam> notFoundTeams = teams.stream()
-				.filter(team -> teamRepository.findOne(team.getTeam().getId()) == null)
+				.filter(team -> !teamRepository.findById(team.getTeam().getId()).isPresent())
 				.collect(Collectors.toSet());
 		if (!notFoundTeams.isEmpty()) {
 			throw InvalidDataException.createWithUnfoundTeams(notFoundTeams);
@@ -235,7 +234,7 @@ public class CompetitionServiceImpl implements CompetitionService {
 			return;
 		}
 		Set<Venue> notFoundVenues = venues.stream()
-				.filter(venue -> venueRepository.findOne(venue.getId()) == null)
+				.filter(venue -> !venueRepository.findById(venue.getId()).isPresent())
 				.collect(Collectors.toSet());
 		if (!notFoundVenues.isEmpty()) {
 			throw InvalidDataException.createWithUnfoundVenues(notFoundVenues);

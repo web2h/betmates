@@ -8,7 +8,7 @@ import static com.web2h.betmates.restapp.rest.controller.UrlConstants.COMPETITIO
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -35,6 +35,7 @@ import com.web2h.betmates.restapp.core.service.competition.CompetitionService;
 import com.web2h.betmates.restapp.model.entity.FieldLength;
 import com.web2h.betmates.restapp.model.entity.competition.Competition;
 import com.web2h.betmates.restapp.model.entity.competition.CompetitionType;
+import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.NotFoundException;
 import com.web2h.betmates.restapp.model.validation.ErrorCode;
@@ -60,7 +61,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 
 	@Before
 	public void before() throws Exception {
-		given(competitionService.create(anyObject(), anyObject())).willReturn(null);
+		given(competitionService.create(any(Competition.class), any(AppUser.class))).willReturn(null);
 		doReturn(null).when(competitionController).getLoggedInUser();
 	}
 
@@ -68,7 +69,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 	public void addOrRemoveTeams_WithValidData_ShouldReturnOk() throws Exception {
 		Competition competition = createValidCompetitionForEdition();
 		String jsonCompetition = asJsonString(competition);
-		given(competitionService.addOrRemoveTeams(anyObject(), anyObject())).willReturn(competition);
+		given(competitionService.addOrRemoveTeams(any(Competition.class), any(AppUser.class))).willReturn(competition);
 
 		ResultActions actions = mockMvc.perform(post(COMPETITION_ADD_OR_REMOVE_TEAMS_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
 		actions.andExpect(status().isOk());
@@ -79,7 +80,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 	public void addOrRemoveTeams_UnknownCompetition_ShouldReturnNotFound() throws Exception {
 		Competition competition = createValidCompetitionForEdition();
 		String jsonCompetition = asJsonString(competition);
-		given(competitionService.addOrRemoveTeams(anyObject(), anyObject())).willThrow(new NotFoundException(Field.ID, Competition.class.getName()));
+		given(competitionService.addOrRemoveTeams(any(Competition.class), any(AppUser.class))).willThrow(new NotFoundException(Field.ID, Competition.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(COMPETITION_ADD_OR_REMOVE_TEAMS_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
 		actions.andExpect(status().isNotFound());
@@ -93,7 +94,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 	public void addOrRemoveTeams_InternalError_ShouldReturnInternalError() throws Exception {
 		Competition competition = createValidCompetitionForEdition();
 		String jsonCompetition = asJsonString(competition);
-		given(competitionService.addOrRemoveTeams(anyObject(), anyObject())).willThrow(new RuntimeException("message"));
+		given(competitionService.addOrRemoveTeams(any(Competition.class), any(AppUser.class))).willThrow(new RuntimeException("message"));
 
 		ResultActions actions = mockMvc.perform(post(COMPETITION_ADD_OR_REMOVE_TEAMS_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
 		actions.andExpect(status().isInternalServerError());
@@ -105,7 +106,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 	public void addOrRemoveVenuess_WithValidData_ShouldReturnOk() throws Exception {
 		Competition competition = createValidCompetitionForEdition();
 		String jsonCompetition = asJsonString(competition);
-		given(competitionService.addOrRemoveVenues(anyObject(), anyObject())).willReturn(competition);
+		given(competitionService.addOrRemoveVenues(any(Competition.class), any(AppUser.class))).willReturn(competition);
 
 		ResultActions actions = mockMvc.perform(post(COMPETITION_ADD_OR_REMOVE_VENUES_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
 		actions.andExpect(status().isOk());
@@ -116,7 +117,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 	public void addOrRemoveVenues_UnknownCompetition_ShouldReturnNotFound() throws Exception {
 		Competition competition = createValidCompetitionForEdition();
 		String jsonCompetition = asJsonString(competition);
-		given(competitionService.addOrRemoveVenues(anyObject(), anyObject())).willThrow(new NotFoundException(Field.ID, Competition.class.getName()));
+		given(competitionService.addOrRemoveVenues(any(Competition.class), any(AppUser.class))).willThrow(new NotFoundException(Field.ID, Competition.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(COMPETITION_ADD_OR_REMOVE_VENUES_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
 		actions.andExpect(status().isNotFound());
@@ -130,7 +131,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 	public void addOrRemoveVenues_InternalError_ShouldReturnInternalError() throws Exception {
 		Competition competition = createValidCompetitionForEdition();
 		String jsonCompetition = asJsonString(competition);
-		given(competitionService.addOrRemoveVenues(anyObject(), anyObject())).willThrow(new RuntimeException("message"));
+		given(competitionService.addOrRemoveVenues(any(Competition.class), any(AppUser.class))).willThrow(new RuntimeException("message"));
 
 		ResultActions actions = mockMvc.perform(post(COMPETITION_ADD_OR_REMOVE_VENUES_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
 		actions.andExpect(status().isInternalServerError());
@@ -143,7 +144,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 		Competition competition = createValidCompetitionForCreation();
 		String jsonCompetition = asJsonString(competition);
 		competition.setId(1l);
-		given(competitionService.create(anyObject(), anyObject())).willReturn(competition);
+		given(competitionService.create(any(Competition.class), any(AppUser.class))).willReturn(competition);
 
 		ResultActions actions = mockMvc.perform(post(COMPETITION_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
 		actions.andExpect(status().isOk());
@@ -161,7 +162,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 		competition.setId(1l);
 		competition.setNameEn(nameEn);
 		competition.setNameFr(nameFr);
-		given(competitionService.create(anyObject(), anyObject())).willReturn(competition);
+		given(competitionService.create(any(Competition.class), any(AppUser.class))).willReturn(competition);
 
 		ResultActions actions = mockMvc.perform(post(COMPETITION_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
 		actions.andExpect(status().isOk());
@@ -171,7 +172,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithExistingEnglishName_ShouldReturnBadRequest() throws Exception {
 		Competition competition = createValidCompetitionForCreation();
-		given(competitionService.create(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_EN, Competition.class.getName()));
+		given(competitionService.create(any(Competition.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_EN, Competition.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(COMPETITION_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(competition)));
 		actions.andExpect(status().isBadRequest());
@@ -184,7 +185,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithExistingFrenchName_ShouldReturnBadRequest() throws Exception {
 		Competition competition = createValidCompetitionForCreation();
-		given(competitionService.create(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_FR, Competition.class.getName()));
+		given(competitionService.create(any(Competition.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_FR, Competition.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(COMPETITION_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(competition)));
 		actions.andExpect(status().isBadRequest());
@@ -197,7 +198,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithServerException_ShouldReturnInternalServerError() throws Exception {
 		Competition competition = createValidCompetitionForCreation();
-		given(competitionService.create(anyObject(), anyObject())).willThrow(new RuntimeException("Message"));
+		given(competitionService.create(any(Competition.class), any(AppUser.class))).willThrow(new RuntimeException("Message"));
 
 		ResultActions actions = mockMvc.perform(post(COMPETITION_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(competition)));
 		actions.andExpect(status().isInternalServerError());
@@ -278,7 +279,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 	public void edit_WithValidCity_ShouldReturnOk() throws Exception {
 		Competition competition = createValidCompetitionForEdition();
 		String jsonCompetition = asJsonString(competition);
-		given(competitionService.edit(anyObject(), anyObject())).willReturn(competition);
+		given(competitionService.edit(any(Competition.class), any(AppUser.class))).willReturn(competition);
 
 		ResultActions actions = mockMvc.perform(put(COMPETITION_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
 		actions.andExpect(status().isOk());
@@ -289,7 +290,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 	public void edit_UnknownCity_ShouldReturnNotFound() throws Exception {
 		Competition competition = createValidCompetitionForEdition();
 		String jsonCompetition = asJsonString(competition);
-		given(competitionService.edit(anyObject(), anyObject())).willThrow(new NotFoundException(Field.ID, Competition.class.getName()));
+		given(competitionService.edit(any(Competition.class), any(AppUser.class))).willThrow(new NotFoundException(Field.ID, Competition.class.getName()));
 
 		ResultActions actions = mockMvc.perform(put(COMPETITION_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCompetition));
 		actions.andExpect(status().isNotFound());
@@ -302,7 +303,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithExistingEnglishName_ShouldReturnBadRequest() throws Exception {
 		Competition competition = createValidCompetitionForEdition();
-		given(competitionService.edit(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_EN, Competition.class.getName()));
+		given(competitionService.edit(any(Competition.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_EN, Competition.class.getName()));
 
 		ResultActions actions = mockMvc.perform(put(COMPETITION_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(competition)));
 		actions.andExpect(status().isBadRequest());
@@ -315,7 +316,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithExistingFrenchName_ShouldReturnBadRequest() throws Exception {
 		Competition competition = createValidCompetitionForEdition();
-		given(competitionService.edit(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_FR, Competition.class.getName()));
+		given(competitionService.edit(any(Competition.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_FR, Competition.class.getName()));
 
 		ResultActions actions = mockMvc.perform(put(COMPETITION_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(competition)));
 		actions.andExpect(status().isBadRequest());
@@ -328,7 +329,7 @@ public class CompetitionControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithServerException_ShouldReturnInternalServerError() throws Exception {
 		Competition competition = createValidCompetitionForEdition();
-		given(competitionService.edit(anyObject(), anyObject())).willThrow(new RuntimeException("Message"));
+		given(competitionService.edit(any(Competition.class), any(AppUser.class))).willThrow(new RuntimeException("Message"));
 
 		ResultActions actions = mockMvc.perform(put(COMPETITION_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(competition)));
 		actions.andExpect(status().isInternalServerError());

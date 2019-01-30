@@ -7,7 +7,7 @@ import static com.web2h.betmates.restapp.rest.controller.UrlConstants.VENUE_EDIT
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -33,6 +33,7 @@ import com.web2h.betmates.restapp.model.entity.FieldLength;
 import com.web2h.betmates.restapp.model.entity.reference.City;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
 import com.web2h.betmates.restapp.model.entity.reference.Venue;
+import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.InvalidDataException;
 import com.web2h.betmates.restapp.model.exception.NotFoundException;
@@ -58,7 +59,7 @@ public class VenueControllerTest extends CommonControllerTest {
 
 	@Before
 	public void before() throws Exception {
-		given(venueService.create(anyObject(), anyObject())).willReturn(null);
+		given(venueService.create(any(Venue.class), any(AppUser.class))).willReturn(null);
 		doReturn(null).when(VenueController).getLoggedInUser();
 	}
 
@@ -67,7 +68,7 @@ public class VenueControllerTest extends CommonControllerTest {
 		Venue venue = createValidVenueForCreation();
 		String jsonVenue = asJsonString(venue);
 		venue.setId(1l);
-		given(venueService.create(anyObject(), anyObject())).willReturn(venue);
+		given(venueService.create(any(Venue.class), any(AppUser.class))).willReturn(venue);
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonVenue));
 		actions.andExpect(status().isOk());
@@ -85,7 +86,7 @@ public class VenueControllerTest extends CommonControllerTest {
 		venue.setId(1l);
 		venue.setNameEn(nameEn);
 		venue.setNameFr(nameFr);
-		given(venueService.create(anyObject(), anyObject())).willReturn(venue);
+		given(venueService.create(any(Venue.class), any(AppUser.class))).willReturn(venue);
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonVenue));
 		actions.andExpect(status().isOk());
@@ -95,7 +96,7 @@ public class VenueControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithExistingEnglishName_ShouldReturnBadRequest() throws Exception {
 		Venue venue = createValidVenueForCreation();
-		given(venueService.create(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_EN, Venue.class.getName()));
+		given(venueService.create(any(Venue.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_EN, Venue.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
 		actions.andExpect(status().isBadRequest());
@@ -108,7 +109,7 @@ public class VenueControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithExistingFrenchName_ShouldReturnBadRequest() throws Exception {
 		Venue venue = createValidVenueForCreation();
-		given(venueService.create(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_FR, Venue.class.getName()));
+		given(venueService.create(any(Venue.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_FR, Venue.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
 		actions.andExpect(status().isBadRequest());
@@ -121,7 +122,7 @@ public class VenueControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithUnknownCity_ShouldReturnBadRequest() throws Exception {
 		Venue venue = createValidVenueForCreation();
-		given(venueService.create(anyObject(), anyObject())).willThrow(InvalidDataException.createWithFieldAndErrorCode(Field.CITY, ErrorCode.NOT_FOUND));
+		given(venueService.create(any(Venue.class), any(AppUser.class))).willThrow(InvalidDataException.createWithFieldAndErrorCode(Field.CITY, ErrorCode.NOT_FOUND));
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
 		actions.andExpect(status().isBadRequest());
@@ -134,7 +135,7 @@ public class VenueControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithServerException_ShouldReturnInternalServerError() throws Exception {
 		Venue venue = createValidVenueForCreation();
-		given(venueService.create(anyObject(), anyObject())).willThrow(new RuntimeException("Message"));
+		given(venueService.create(any(Venue.class), any(AppUser.class))).willThrow(new RuntimeException("Message"));
 
 		ResultActions actions = mockMvc.perform(post(VENUE_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
 		actions.andExpect(status().isInternalServerError());
@@ -201,7 +202,7 @@ public class VenueControllerTest extends CommonControllerTest {
 	public void edit_WithValidVenue_ShouldReturnOk() throws Exception {
 		Venue venue = createValidVenueForEdition();
 		String jsonVenue = asJsonString(venue);
-		given(venueService.edit(anyObject(), anyObject())).willReturn(venue);
+		given(venueService.edit(any(Venue.class), any(AppUser.class))).willReturn(venue);
 
 		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonVenue));
 		actions.andExpect(status().isOk());
@@ -212,7 +213,7 @@ public class VenueControllerTest extends CommonControllerTest {
 	public void edit_UnknownVenue_ShouldReturnNotFound() throws Exception {
 		Venue venue = createValidVenueForEdition();
 		String jsonVenue = asJsonString(venue);
-		given(venueService.edit(anyObject(), anyObject())).willThrow(new NotFoundException(Field.ID, Venue.class.getName()));
+		given(venueService.edit(any(Venue.class), any(AppUser.class))).willThrow(new NotFoundException(Field.ID, Venue.class.getName()));
 
 		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonVenue));
 		actions.andExpect(status().isNotFound());
@@ -225,7 +226,7 @@ public class VenueControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithUnknownCity_ShouldReturnBadRequest() throws Exception {
 		Venue venue = createValidVenueForEdition();
-		given(venueService.edit(anyObject(), anyObject())).willThrow(InvalidDataException.createWithFieldAndErrorCode(Field.CITY, ErrorCode.NOT_FOUND));
+		given(venueService.edit(any(Venue.class), any(AppUser.class))).willThrow(InvalidDataException.createWithFieldAndErrorCode(Field.CITY, ErrorCode.NOT_FOUND));
 
 		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
 		actions.andExpect(status().isBadRequest());
@@ -238,7 +239,7 @@ public class VenueControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithExistingEnglishName_ShouldReturnBadRequest() throws Exception {
 		Venue venue = createValidVenueForEdition();
-		given(venueService.edit(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_EN, Venue.class.getName()));
+		given(venueService.edit(any(Venue.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_EN, Venue.class.getName()));
 
 		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
 		actions.andExpect(status().isBadRequest());
@@ -251,7 +252,7 @@ public class VenueControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithExistingFrenchName_ShouldReturnBadRequest() throws Exception {
 		Venue venue = createValidVenueForEdition();
-		given(venueService.edit(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_FR, Venue.class.getName()));
+		given(venueService.edit(any(Venue.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_FR, Venue.class.getName()));
 
 		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
 		actions.andExpect(status().isBadRequest());
@@ -264,7 +265,7 @@ public class VenueControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithServerException_ShouldReturnInternalServerError() throws Exception {
 		Venue venue = createValidVenueForEdition();
-		given(venueService.edit(anyObject(), anyObject())).willThrow(new RuntimeException("Message"));
+		given(venueService.edit(any(Venue.class), any(AppUser.class))).willThrow(new RuntimeException("Message"));
 
 		ResultActions actions = mockMvc.perform(put(VENUE_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(venue)));
 		actions.andExpect(status().isInternalServerError());

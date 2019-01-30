@@ -7,7 +7,7 @@ import static com.web2h.betmates.restapp.rest.controller.UrlConstants.COUNTRY_ED
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.web2h.betmates.restapp.core.service.reference.CountryService;
 import com.web2h.betmates.restapp.model.entity.FieldLength;
 import com.web2h.betmates.restapp.model.entity.reference.Country;
+import com.web2h.betmates.restapp.model.entity.user.AppUser;
 import com.web2h.betmates.restapp.model.exception.AlreadyExistsException;
 import com.web2h.betmates.restapp.model.exception.NotFoundException;
 import com.web2h.betmates.restapp.model.validation.ErrorCode;
@@ -55,7 +56,7 @@ public class CountryControllerTest extends CommonControllerTest {
 
 	@Before
 	public void before() throws Exception {
-		given(countryService.create(anyObject(), anyObject())).willReturn(null);
+		given(countryService.create(any(Country.class), any(AppUser.class))).willReturn(null);
 		doReturn(null).when(countryController).getLoggedInUser();
 	}
 
@@ -64,7 +65,7 @@ public class CountryControllerTest extends CommonControllerTest {
 		Country country = createValidCountryForCreation();
 		String jsonCountry = asJsonString(country);
 		country.setId(1l);
-		given(countryService.create(anyObject(), anyObject())).willReturn(country);
+		given(countryService.create(any(Country.class), any(AppUser.class))).willReturn(country);
 
 		ResultActions actions = mockMvc.perform(post(COUNTRY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCountry));
 		actions.andExpect(status().isOk());
@@ -83,7 +84,7 @@ public class CountryControllerTest extends CommonControllerTest {
 		country.setId(1l);
 		country.setNameEn(nameEn);
 		country.setNameFr(nameFr);
-		given(countryService.create(anyObject(), anyObject())).willReturn(country);
+		given(countryService.create(any(Country.class), any(AppUser.class))).willReturn(country);
 
 		ResultActions actions = mockMvc.perform(post(COUNTRY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCountry));
 		actions.andExpect(status().isOk());
@@ -93,7 +94,7 @@ public class CountryControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithExistingEnglishName_ShouldReturnBadRequest() throws Exception {
 		Country country = createValidCountryForCreation();
-		given(countryService.create(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_EN, Country.class.getName()));
+		given(countryService.create(any(Country.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_EN, Country.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(COUNTRY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
 		actions.andExpect(status().isBadRequest());
@@ -106,7 +107,7 @@ public class CountryControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithExistingFrenchName_ShouldReturnBadRequest() throws Exception {
 		Country country = createValidCountryForCreation();
-		given(countryService.create(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_FR, Country.class.getName()));
+		given(countryService.create(any(Country.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_FR, Country.class.getName()));
 
 		ResultActions actions = mockMvc.perform(post(COUNTRY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
 		actions.andExpect(status().isBadRequest());
@@ -119,7 +120,7 @@ public class CountryControllerTest extends CommonControllerTest {
 	@Test
 	public void create_WithServerException_ShouldReturnInternalServerError() throws Exception {
 		Country country = createValidCountryForCreation();
-		given(countryService.create(anyObject(), anyObject())).willThrow(new RuntimeException("Message"));
+		given(countryService.create(any(Country.class), any(AppUser.class))).willThrow(new RuntimeException("Message"));
 
 		ResultActions actions = mockMvc.perform(post(COUNTRY_CREATION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
 		actions.andExpect(status().isInternalServerError());
@@ -179,7 +180,7 @@ public class CountryControllerTest extends CommonControllerTest {
 	public void edit_WithValidCountry_ShouldReturnOk() throws Exception {
 		Country country = createValidCountryForEdition();
 		String jsonCountry = asJsonString(country);
-		given(countryService.edit(anyObject(), anyObject())).willReturn(country);
+		given(countryService.edit(any(Country.class), any(AppUser.class))).willReturn(country);
 
 		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCountry));
 		actions.andExpect(status().isOk());
@@ -190,7 +191,7 @@ public class CountryControllerTest extends CommonControllerTest {
 	public void edit_UnknownCountry_ShouldReturnNotFound() throws Exception {
 		Country country = createValidCountryForEdition();
 		String jsonCountry = asJsonString(country);
-		given(countryService.edit(anyObject(), anyObject())).willThrow(new NotFoundException(Field.ID, Country.class.getName()));
+		given(countryService.edit(any(Country.class), any(AppUser.class))).willThrow(new NotFoundException(Field.ID, Country.class.getName()));
 
 		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(jsonCountry));
 		actions.andExpect(status().isNotFound());
@@ -203,7 +204,7 @@ public class CountryControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithExistingEnglishName_ShouldReturnBadRequest() throws Exception {
 		Country country = createValidCountryForEdition();
-		given(countryService.edit(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_EN, Country.class.getName()));
+		given(countryService.edit(any(Country.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_EN, Country.class.getName()));
 
 		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
 		actions.andExpect(status().isBadRequest());
@@ -216,7 +217,7 @@ public class CountryControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithExistingFrenchName_ShouldReturnBadRequest() throws Exception {
 		Country country = createValidCountryForEdition();
-		given(countryService.edit(anyObject(), anyObject())).willThrow(new AlreadyExistsException(Field.NAME_FR, Country.class.getName()));
+		given(countryService.edit(any(Country.class), any(AppUser.class))).willThrow(new AlreadyExistsException(Field.NAME_FR, Country.class.getName()));
 
 		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
 		actions.andExpect(status().isBadRequest());
@@ -229,7 +230,7 @@ public class CountryControllerTest extends CommonControllerTest {
 	@Test
 	public void edit_WithServerException_ShouldReturnInternalServerError() throws Exception {
 		Country country = createValidCountryForEdition();
-		given(countryService.edit(anyObject(), anyObject())).willThrow(new RuntimeException("Message"));
+		given(countryService.edit(any(Country.class), any(AppUser.class))).willThrow(new RuntimeException("Message"));
 
 		ResultActions actions = mockMvc.perform(put(COUNTRY_EDITION_URL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(country)));
 		actions.andExpect(status().isInternalServerError());

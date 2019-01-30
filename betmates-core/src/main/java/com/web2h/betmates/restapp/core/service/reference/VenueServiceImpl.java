@@ -1,7 +1,7 @@
 package com.web2h.betmates.restapp.core.service.reference;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,8 +28,6 @@ public class VenueServiceImpl extends ReferenceServiceImpl<Venue> implements Ven
 
 	private CityRepository cityRepository;
 
-	private Logger logger = LoggerFactory.getLogger(VenueServiceImpl.class);
-
 	public VenueServiceImpl(VenueRepository venueRepository, CityRepository cityRepository, ReferenceLogService referenceLogService) {
 		super(referenceLogService);
 		this.venueRepository = venueRepository;
@@ -50,12 +48,9 @@ public class VenueServiceImpl extends ReferenceServiceImpl<Venue> implements Ven
 
 	@Override
 	public void checkIfLinkedReferenceExists(Venue venue) throws InvalidDataException {
-		City city = cityRepository.findOne(venue.getCity().getId());
-		if (city == null) {
-			logger.warn("No city exists with the given ID [" + venue.getCity().getId() + "]");
-			throw InvalidDataException.createWithFieldAndErrorCode(Field.CITY, ErrorCode.NOT_FOUND);
-		}
-		venue.setCity(city);
+		Optional<City> city = cityRepository.findById(venue.getCity().getId());
+		city.orElseThrow(() -> InvalidDataException.createWithFieldAndErrorCode(Field.CITY, ErrorCode.NOT_FOUND));
+		venue.setCity(city.get());
 	}
 
 	@Override
@@ -67,8 +62,8 @@ public class VenueServiceImpl extends ReferenceServiceImpl<Venue> implements Ven
 	public void merge(Venue existingVenue, Venue newVenue) {
 		super.merge(existingVenue, newVenue);
 		if (!existingVenue.getCity().equals(newVenue.getCity())) {
-			City newCity = cityRepository.findOne(newVenue.getCity().getId());
-			existingVenue.setCity(newCity);
+			Optional<City> newCity = cityRepository.findById(newVenue.getCity().getId());
+			existingVenue.setCity(newCity.get());
 		}
 	}
 }
